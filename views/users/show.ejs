@@ -1,0 +1,38 @@
+<!-- " .. " takes you one folder back -->
+<% include ../partials/header.ejs %>
+
+<div class="row">
+	<div class="col-md-4">
+
+		<div class="card text-center mb-4">
+			<h2 class="card-header"><%= user.username %></h1>
+
+			<div class="card-body">
+				<img class="card-img-top" src="<%=user.picture%>" alt="user profile image">
+
+				<hr>
+
+				<div class="card-link">
+					<a href="mailto:<%= user.email %>"><%= user.email %></a>
+				</div>
+			</div>
+		</div>
+
+	</div>
+
+	<div class="col-md-8">
+
+		<div class="card">
+			<h2 class="card-header">Campgrounds created by this user:</h2>
+			<ul class="list-group list-group-flush">
+				<% campgrounds.forEach(function(campground) { %>
+					<li class="list-group-item"><a href="/campgrounds/<%= campground.id %>"><%= campground.name %></a></li>
+				<% });%>
+			</ul>
+		</div>
+
+	</div>
+</div>
+
+
+<% include ../partials/footer.ejs %>

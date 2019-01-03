@@ -1,0 +1,11 @@
+# this hides the 'env' file when uploading to git
+.env
+
+# this hides the 'node_modules' folder, keeps codebase cleaner
+/node_modules
+
+# hide sublime workspace file
+final-workspace.sublime-workspace
+
+# hide 'source_images' folder
+/source_images

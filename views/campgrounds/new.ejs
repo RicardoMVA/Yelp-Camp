@@ -1,0 +1,51 @@
+<!-- " .. " takes you one folder back -->
+<% include ../partials/header.ejs %>
+
+<div class="row form-background">
+
+	<div class="col-md-12 text-center">
+		<h1>Create a new campground</h1>
+	</div>
+	
+	<div class="container form">
+		<!-- 'enctype' allows for the file/image upload -->
+		<form action="/campgrounds" method="POST" enctype="multipart/form-data">
+			<div class="form-group">
+				<label for="name">Name</label>
+				<input class="form-control" type="text" placeholder="name" name="name" required>
+			</div>
+
+			<div class="form-group">
+				<label for="image">Upload image</label>
+				<!-- 'accept="image/*"' makes it so that only image
+				files can be uploaded -->
+				<input type="file" id="image" name="image" accept="image/*" required>
+			</div>
+
+			<div class="form-group">
+				<label for="price">Price</label>
+				<input class="form-control" type="number" placeholder="price" name="price" min="0" step="0.01" required>
+			</div>
+
+			<div class="form-group">
+				<label for="location">Location</label>
+			    <input class="form-control" type="text" name="location" id="location" placeholder="location" required>
+			</div>
+
+			<div class="form-group">
+				<label for="description">Description</label>
+				<input class="form-control" type="text" placeholder="camp description" name="description" required>
+			</div>
+
+			<div class="form-group text-center">
+				<button class="btn btn-lg btn-success">Submit!</button>
+			</div>
+		</form>
+
+		<a href="/campgrounds">Go Back to Campgrounds Page</a>
+
+	</div>
+</div>
+
+
+<% include ../partials/footer.ejs %>

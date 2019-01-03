@@ -1,0 +1,114 @@
+<!-- " .. " takes you one folder back -->
+<% include ../partials/header.ejs %>
+
+
+<div class="row">
+	<div class="col-md-3">
+
+		<div class="list-group mb-3">
+			<li class="list-group-item active">Info 1</li>
+			<li class="list-group-item">Info 2</li>
+			<li class="list-group-item">Info 3</li>
+		</div>
+
+		<!-- google map display, referenced in 'main.css' -->
+		<div id="map" class="mb-3"></div>
+
+	</div>
+
+
+	<div class="col-md-9">
+
+		<div class="card mb-3">
+			<img class="card-img-top" src="/images/campgrounds/<%= campground.image %>">
+			<div class="card-body">
+				<!-- campground info -->
+				<h5 class="card-text float-right">$<%= campground.price %> / night</h5>
+				<h4 class="card-title"><a href="#"><%= campground.name %></a></h4>
+				<p class="card-text">
+					<!-- this uses 'moment' to determine how long it has been since the comment was made -->
+					<em>Submitted by <a href="/users/<%= campground.author.id %>"><%= campground.author.username %></a>, <%= moment(campground.createdAt).fromNow() %></em>
+				</p>
+				<p class="card-text"><%= campground.description %></p>
+
+				<!-- checks if user is logged in and if it is also the author of the current campground -->
+				<% if (currentUser && campground.author.id.equals(currentUser._id) || currentUser && currentUser.isAdmin) { %>
+					<!-- edit campground button -->
+					<a class="btn btn-warning" href="/campgrounds/<%= campground._id %>/edit">Edit</a>
+					<!-- delete campground form and button -->
+					<form class="delete-form" action="/campgrounds/<%= campground._id %>?_method=DELETE" method="POST">
+						<button class="btn btn-danger">Delete</button>
+					</form>
+				<% } %>
+			</div>
+		</div>
+
+		<div class="card">
+			<div class="card-header" id="commentHeader">
+				<h5 class="d-inline">Comments</h5>
+				<!-- button to add new comment -->
+				<a class="btn btn-success float-right d-inline" href="/campgrounds/<%= campground._id %>/comments/new">New Comment</a>
+			</div>
+
+			<div class="card-body">
+				<!-- display existing comments -->
+				<% campground.comments.forEach(function(comment){ %>
+					<div class="row">
+						<div class="col-md-12">
+							<strong><%= comment.author.username %></strong>
+							<span class="float-right"><%= moment(comment.createdAt).fromNow() %></span>
+							<p><%= comment.text %></p>
+							<!-- check if user logged in is also the author of the comment -->
+							<% if (currentUser && comment.author.id.equals(currentUser._id) || currentUser && currentUser.isAdmin) { %>
+								<!-- edit button -->
+								<a class="btn btn-sm btn-warning" href="/campgrounds/<%= campground._id %>/comments/<%= comment._id %>/edit">Edit</a>
+								<!-- delete button -->
+								<form action="/campgrounds/<%= campground._id %>/comments/<%= comment._id %>?_method=DELETE" method="POST" class="delete-form">
+									<input type="submit" class="btn btn-sm btn-danger" value="Delete">
+								</form>
+								<hr>
+							<% } %>
+						</div>
+					</div>
+				<% }) %>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<!-- MAP FROM GOOGLE -->
+<script>
+  function initMap() {
+    var lat = <%= campground.lat %>;
+    var lng = <%= campground.lng %>;
+    var center = {lat: lat, lng: lng };
+    // this finds the div with id 'map' and puts the google map there
+    var map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 8,
+        center: center,
+        scrollwheel: false
+    });
+    var contentString = `
+      <strong><%= campground.name %><br />
+      <%= campground.location %></strong>
+      <p><%= campground.description %></p>
+    `
+    var infowindow = new google.maps.InfoWindow({
+      content: contentString
+    });
+    var marker = new google.maps.Marker({
+        position: center,
+        map: map
+    });
+    marker.addListener('click', function() {
+      infowindow.open(map, marker);
+    });
+  }
+</script>
+<!-- this API key is protected because it can be seen with the browser -->
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBrXyoujCQYjI8E-U7Ii23JUcOERavKROA&callback=initMap"
+  type="text/javascript"></script>
+
+
+<% include ../partials/footer.ejs %>

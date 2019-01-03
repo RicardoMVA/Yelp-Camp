@@ -1,0 +1,25 @@
+<% include partials/header.ejs %>
+
+
+<div class="row form-background">
+	
+	<div class="col-md-12 text-center">
+        <h1>Forgot Password</h1>
+    </div>
+    
+    <div class="container form">
+		<form action="/forgot" method="POST">
+			<p>Please inform the registered email to receive a new password</p>
+			<div class="form-group">
+				<label for="email">Email</label>
+				<input type="email" name="email" class="form-control">
+			</div>
+			<div class="form-group text-center">
+				<input type="submit" class="btn btn-success" value="Reset Password">
+			</div>
+		</form>
+	</div>
+</div>
+
+
+<% include partials/footer.ejs %>
