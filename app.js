@@ -124,7 +124,13 @@ app.use("/campgrounds", campgroundRoutes);
 app.use("/campgrounds/:id/comments", commentRoutes);
 
 
+var port = process.env.PORT;
 
-app.listen(3000, function(){
-	console.log("YelpCamp server started on localhost:3000");
+// this check allows code to work both locally and inside heroku
+if (port == null || port = "") {
+	port = 3000;
+}
+
+app.listen(port, function(){
+	console.log("YelpCamp server started!");
 });
