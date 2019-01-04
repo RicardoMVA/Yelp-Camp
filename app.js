@@ -33,8 +33,9 @@ var commentRoutes 	 = require("./routes/comments"),
 // CONFIGURATION
 // ===================
 
-// create and use database
-mongoose.connect("mongodb://localhost/yelp_camp");
+// create and use database on mlab or locally
+var url = process.env.DATABASEURL || "mongodb://localhost/yelp_camp";
+mongoose.connect(url);
 
 // use to pass variables info from/to page body
 app.use(bodyParser.urlencoded({extended: true}));
