@@ -127,7 +127,7 @@ app.use("/campgrounds/:id/comments", commentRoutes);
 var port = process.env.PORT;
 
 // this check allows code to work both locally and inside heroku
-if (port == null || port = "") {
+if (port == null || port == "") {
 	port = 3000;
 }
 
