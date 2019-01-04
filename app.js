@@ -124,17 +124,6 @@ app.use("/campgrounds", campgroundRoutes);
 app.use("/campgrounds/:id/comments", commentRoutes);
 
 
-// RESTFUL ROUTES
-
-// name		  |		 url                      | verb	|		description
-// =================================================================
-// INDEX	  | /CAMPGROUNDS 	              | GET 	| display existing campgrounds
-// NEW		  | /CAMPGROUNDS/NEW              | GET     | displays form to create new campground
-// CREATE 	  | /CAMPGROUNDS 	              | POST    | creates new campground in DB
-// SHOW 	  | /CAMPGROUNDS/:ID              | GET 	| display detailed information on specific campground
-// NEW 	      | /CAMPGROUNDS/:ID/COMMENTS/NEW | GET 	| display form to create new comment on specific campground
-// SHOW 	  | /CAMPGROUNDS/:ID/COMMENTS     | POST 	| send new comment on specific campground
-
 
 app.listen(3000, function(){
 	console.log("YelpCamp server started on localhost:3000");
