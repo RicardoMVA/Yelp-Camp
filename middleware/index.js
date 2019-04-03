@@ -1,25 +1,17 @@
-// these models are needed since they're being used by the 
-// middleware functions
-var Campground = require("../models/campgrounds"),
-	Comment   = require("../models/comments");
+import Campground from "../models/campgrounds";
+import Comment from "../models/comments";
 
 
-// here we'll store all the functions
-var middlewareObj = {};
-
-
-middlewareObj.checkCampgroundOwnership = function(req, res, next) {
+const checkCampgroundOwnership = (req, res, next) => {
 	// check if user is logged in
 	if (req.isAuthenticated()){
-		// find the campground by id
-		Campground.findById(req.params.id, function(err, foundCampground){
+		Campground.findById(req.params.id, (err, foundCampground) => {
 			// this 'or' statement handles scenarios where the database
 			// doesn't returns an error, but also doesn't returns a
 			// valid entry (like 'null')
 			if (err || !foundCampground) {
 				console.log(err);
 				req.flash("error", "Campground not found");
-				// this takes the user back to the last page visited
 				res.redirect("back");
 			} else {
 				// check if user is the same as the campground author
@@ -43,11 +35,11 @@ middlewareObj.checkCampgroundOwnership = function(req, res, next) {
 }
 
 
-middlewareObj.checkCommentOwnership = function(req, res, next) {
+const checkCommentOwnership = (req, res, next) => {
 	// check if user is logged in
 	if (req.isAuthenticated()){
 		// find the comment by id
-		Comment.findById(req.params.comment_id, function(err, foundComment){
+		Comment.findById(req.params.comment_id, (err, foundComment) => {
 			// this 'or' statement handles scenarios where the database
 			// doesn't returns an error, but also doesn't returns a
 			// valid entry (like 'null')
@@ -78,7 +70,7 @@ middlewareObj.checkCommentOwnership = function(req, res, next) {
 }
 
 
-middlewareObj.isLoggedIn = function(req, res, next) {
+const checkLogin = (req, res, next) => {
 	if(req.isAuthenticated()){
 		return next();
 	}
@@ -90,4 +82,8 @@ middlewareObj.isLoggedIn = function(req, res, next) {
 }
 
 
-module.exports = middlewareObj;
+export {
+	checkCampgroundOwnership,
+	checkCommentOwnership,
+	checkLogin
+}
