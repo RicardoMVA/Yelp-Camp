@@ -3,7 +3,6 @@ import Comment from "../models/comments";
 
 
 const checkCampgroundOwnership = (req, res, next) => {
-	// check if user is logged in
 	if (req.isAuthenticated()){
 		Campground.findById(req.params.id, (err, foundCampground) => {
 			// this 'or' statement handles scenarios where the database
@@ -36,9 +35,7 @@ const checkCampgroundOwnership = (req, res, next) => {
 
 
 const checkCommentOwnership = (req, res, next) => {
-	// check if user is logged in
 	if (req.isAuthenticated()){
-		// find the comment by id
 		Comment.findById(req.params.comment_id, (err, foundComment) => {
 			// this 'or' statement handles scenarios where the database
 			// doesn't returns an error, but also doesn't returns a
