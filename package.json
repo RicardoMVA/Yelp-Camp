@@ -5,12 +5,18 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node app.js"
+    "build": "webpack",
+    "start": "node app-bundle.js"
   },
   "author": "Ricardo de Melo Valença Alves",
   "license": "ISC",
   "dependencies": {
     "async": "^2.6.1",
+    "babel-cli": "^6.26.0",
+    "babel-loader": "^7.1.5",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
     "body-parser": "^1.18.3",
     "connect-flash": "^0.1.1",
     "dotenv": "^6.2.0",
@@ -26,6 +32,9 @@
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
     "passport-local-mongoose": "^5.0.1",
-    "sharp": "^0.21.1"
+    "sharp": "^0.21.1",
+    "webpack": "^4.29.6",
+    "webpack-cli": "^3.3.0",
+    "webpack-node-externals": "^1.7.2"
   }
 }
