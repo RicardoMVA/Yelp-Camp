@@ -1,10 +1,8 @@
+import {checkCampgroundOwnership, checkLogin} from "../middleware/index";
+
 var express    = require("express"),
 	router     = express.Router(),
 	Campground = require("../models/campgrounds"),
-	// when you require a folder, if there is a file called
-	// "index.js" inside of it, it will be loaded automatically
-	// that's what we're doing here
-	middleware = require("../middleware"),
 	// this manages file uploading, npm install multer
 	multer	   = require("multer"),
 	// optimizes images, npm install sharp
@@ -94,7 +92,7 @@ router.get("/", function(req, res){
 
 
 // NEW - show form to create new campground, if logged in
-router.get("/new", middleware.isLoggedIn, function(req, res){
+router.get("/new", checkLogin, function(req, res){
 	res.render("campgrounds/new");
 });
 
@@ -102,7 +100,7 @@ router.get("/new", middleware.isLoggedIn, function(req, res){
 // CREATE - adds new campground in DB with image, if logged in
 // 'upload.single("image")' is taking the 'image' in the form inside 
 // the 'new.ejs' campgrounds page
-router.post("/", middleware.isLoggedIn, upload.single("image"), function(req, res){
+router.post("/", checkLogin, upload.single("image"), function(req, res){
 	// 'req.file.path' comes from 'multer', and is the name of the
 	// file uploaded through the form in 'new.ejs'
 	// here we optimize the image using 'sharp', by taking the uploaded 
@@ -164,7 +162,7 @@ router.post("/", middleware.isLoggedIn, upload.single("image"), function(req, re
 
 
 // EDIT campground route, if user logged is the same as author
-router.get("/:id/edit", middleware.checkCampgroundOwnership, function(req, res){
+router.get("/:id/edit", checkCampgroundOwnership, function(req, res){
 	// find the campground to edit, by id
 	Campground.findById(req.params.id, function(err, foundCampground){
 		if (err) {
@@ -182,7 +180,7 @@ router.get("/:id/edit", middleware.checkCampgroundOwnership, function(req, res){
 // UPDATE campground route, if user logged is the same as author
 // 'upload.single("image")' is taking the 'image' in the form inside 
 // the 'edit.ejs' campgrounds page
-router.put("/:id", middleware.checkCampgroundOwnership, upload.single("image"), function(req, res){
+router.put("/:id", checkCampgroundOwnership, upload.single("image"), function(req, res){
 	// this runs if no image is sent to update
 	if (!req.file) {
 		// code for checking and storing geocode location
@@ -272,7 +270,7 @@ router.put("/:id", middleware.checkCampgroundOwnership, upload.single("image"), 
 
 
 // DELETE/DESTROY campground route, if user logged is the same as author
-router.delete("/:id", middleware.checkCampgroundOwnership, function(req, res){
+router.delete("/:id", checkCampgroundOwnership, function(req, res){
 	// find campground by id to erase it's image
 	Campground.findById(req.params.id, function(err, campground){			
 		// delete campground image from server folder

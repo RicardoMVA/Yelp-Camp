@@ -1,13 +1,11 @@
+import {checkCommentOwnership, checkLogin} from "../middleware/index";
+
 var express    = require("express"),
 	// 'mergeParams' is used to take 'params' from other sources
 	// fixes the 'req.params' returning 'null'
 	router 	   = express.Router({mergeParams: true}),
 	Campground = require("../models/campgrounds"),
-	Comment    = require("../models/comments"),
-	// when you require a folder, if there is a file called
-	// "index.js" inside of it, it will be loaded automatically
-	// that's what we're doing here
-	middleware = require("../middleware");
+	Comment    = require("../models/comments");
 
 
 // ===================
@@ -16,7 +14,7 @@ var express    = require("express"),
 
 
 // NEW - shows form to add comment, if logged in
-router.get("/new", middleware.isLoggedIn, function(req, res){
+router.get("/new", checkLogin, function(req, res){
 	// find campground by id
 	Campground.findById(req.params.id, function(err, campground){
 		if (err) {
@@ -30,7 +28,7 @@ router.get("/new", middleware.isLoggedIn, function(req, res){
 
 
 // CREATE - insert comment in specific campground, if logged in
-router.post("/", middleware.isLoggedIn, function(req, res){
+router.post("/", checkLogin, function(req, res){
 	// lookup campground using ID
 	Campground.findById(req.params.id, function(err, campground){
 		if (err) {
@@ -69,7 +67,7 @@ router.post("/", middleware.isLoggedIn, function(req, res){
 
 
 // EDIT - show form to edit comment
-router.get("/:comment_id/edit", middleware.checkCommentOwnership, function(req, res){
+router.get("/:comment_id/edit", checkCommentOwnership, function(req, res){
 	// this check is necessary so that the edit page can't be 
 	// corrupted with an invalid campground id
 	Campground.findById(req.params.id, function(err, foundCampground){
@@ -93,7 +91,7 @@ router.get("/:comment_id/edit", middleware.checkCommentOwnership, function(req, 
 
 
 // update edited comment
-router.put("/:comment_id", middleware.checkCommentOwnership, function(req, res){
+router.put("/:comment_id", checkCommentOwnership, function(req, res){
 	Comment.findByIdAndUpdate(req.params.comment_id, req.body.comment, function(err, updatedComment){
 		if (err) {
 			console.log(err);
@@ -107,7 +105,7 @@ router.put("/:comment_id", middleware.checkCommentOwnership, function(req, res){
 
 
 // DESTROY/DELETE comment
-router.delete("/:comment_id", middleware.checkCommentOwnership, function(req, res){
+router.delete("/:comment_id", checkCommentOwnership, function(req, res){
 	Comment.findByIdAndRemove(req.params.comment_id, function(err, deletedComment){
 		if (err) {
 			console.log(err);
