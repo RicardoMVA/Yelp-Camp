@@ -1,8 +1,8 @@
-var mongoose = require("mongoose");
-var passportLocalMongoose = require("passport-local-mongoose");
+import mongoose, {Schema} from "mongoose";
+import passportLocalMongoose from "passport-local-mongoose";
 
 
-var UserSchema = new mongoose.Schema({
+const UserSchema = new mongoose.Schema({
 	username: {type: String, unique: true, required: true},
 	picture: String,
 	email: {type: String, unique: true, required: true},

@@ -1,9 +1,9 @@
-var mongoose = require("mongoose");
+import mongoose, {Schema} from "mongoose";
 
 // schema setup for database manipulation
 // this tells mongoose that we want to be able to insert these
 // objects in the database, with the corresponding types
-var campgroundSchema = new mongoose.Schema({
+const campgroundSchema = new mongoose.Schema({
 	name: String,
 	image: String,
 	description: String,
