@@ -1,41 +1,41 @@
-// npm install dotenv
+// external modules
+import dotenv from "dotenv";
+import express from "express";
+import expressSession from "express-session";
+import bodyParser from "body-parser";
+import mongoose from "mongoose";
+import passport from "passport";
+import LocalStrategy from "passport-local";
+import methodOverride from "method-override";
+import flash from "connect-flash";
+import moment from "moment";
 
-// this loads environment variables, which are hidden from end user
-// that's why keys inside the '.env' file don't need to be 
-// restricted in google API
-
-// this is used to load API keys for google maps. write them inside
-// the '.env' file in the root directory
-require("dotenv").config();
-
-
-// modules
-var express        = require("express"),
-	app            = express(),
-	bodyParser     = require("body-parser"),
-	mongoose       = require("mongoose"),
-	passport       = require("passport"),
-	LocalStrategy  = require("passport-local"),
-	methodOverride = require("method-override"),
-	flash		   = require("connect-flash"),
-	Campground     = require("./models/campgrounds"),
-	Comment        = require("./models/comments"),
-	User	       = require("./models/user");
-
+// internal modules
+import Campground from "./models/campgrounds";
+import Comment from "./models/comments";
+import User from "./models/user";
 
 // routes files
-var commentRoutes 	 = require("./routes/comments"),
-	campgroundRoutes = require("./routes/campgrounds"),
-	indexRoutes 	 = require("./routes/index");
+import commentRoutes from "./routes/comments";
+import campgroundRoutes from "./routes/campgrounds";
+import indexRoutes from "./routes/index";
 
 
 // ===================
 // CONFIGURATION
 // ===================
+dotenv.config();
 
+const app = express();
+
+// Mongoose config:
+// Deprecation fixes done as suggested in the docs
+// https://mongoosejs.com/docs/deprecations.html
+mongoose.set('useCreateIndex', true);
+mongoose.set('useFindAndModify', false);
 // create and use database on mlab or locally
-var url = process.env.DATABASEURL || "mongodb://localhost/yelp_camp";
-mongoose.connect(url);
+const url = process.env.DATABASEURL || "mongodb://localhost/yelp_camp";
+mongoose.connect(url, {useNewUrlParser:true});
 
 // use to pass variables info from/to page body
 app.use(bodyParser.urlencoded({extended: true}));
@@ -63,14 +63,14 @@ app.use(flash());
 
 
 // this allows using moment with the variable name "moment"
-app.locals.moment = require("moment");
+app.locals.moment = moment;
 
 
 // ======================
 // PASSPORT CONFIGURATION
 // ======================
 
-app.use(require("express-session")({
+app.use(expressSession({
 	secret: "Once again, Rusty wins cutest dog!",
 	resave: false,
 	saveUninitialized: false
@@ -102,7 +102,7 @@ passport.deserializeUser(User.deserializeUser());
 
 // this passes info in every single route, so all of them
 // will have access to those parameters
-app.use(function(req, res, next){
+app.use((req, res, next) => {
 	// this makes 'currentUser' return the current user logged in. 
 	// if there isn't any, it will return 'undefined'
 	res.locals.currentUser = req.user;
@@ -125,6 +125,6 @@ app.use("/campgrounds", campgroundRoutes);
 app.use("/campgrounds/:id/comments", commentRoutes);
 
 
-app.listen(process.env.PORT || 3000, function(){
+app.listen(process.env.PORT || 3000, () => {
 	console.log("YelpCamp server started!");
 });
