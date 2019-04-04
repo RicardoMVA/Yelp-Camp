@@ -1,12 +1,12 @@
+import express from "express";
+import Campground from "../models/campgrounds";
+import Comment from "../models/comments";
 import {checkCommentOwnership, checkLogin} from "../middleware/index";
 
-var express    = require("express"),
-	// 'mergeParams' is used to take 'params' from other sources
-	// fixes the 'req.params' returning 'null'
-	router 	   = express.Router({mergeParams: true}),
-	Campground = require("../models/campgrounds"),
-	Comment    = require("../models/comments");
 
+// 'mergeParams' is used to take 'params' from other sources
+// fixes the 'req.params' returning 'null'
+const router = express.Router({mergeParams: true});
 
 // ===================
 // COMMENTS ROUTES
@@ -14,30 +14,30 @@ var express    = require("express"),
 
 
 // NEW - shows form to add comment, if logged in
-router.get("/new", checkLogin, function(req, res){
+router.get("/new", checkLogin, (req, res) => {
 	// find campground by id
-	Campground.findById(req.params.id, function(err, campground){
+	Campground.findById(req.params.id, (err, campground) => {
 		if (err) {
 			console.log("Something went wrong when finding the ID to write a new comment");
 			console.log(err);
 		} else {
-			res.render("comments/new", {campground: campground});
+			res.render("comments/new", {campground});
 		}
 	})
 });
 
 
 // CREATE - insert comment in specific campground, if logged in
-router.post("/", checkLogin, function(req, res){
+router.post("/", checkLogin, (req, res) => {
 	// lookup campground using ID
-	Campground.findById(req.params.id, function(err, campground){
+	Campground.findById(req.params.id, (err, campground) => {
 		if (err) {
 			console.log("Something went wrong when adding a new comment");
 			console.log(err);
 			res.redirect("/campgrounds");
 		} else {
 			// take what was sent through the form and add to database
-			Comment.create(req.body.comment, function(err, comment){
+			Comment.create(req.body.comment, (err, comment) => {
 				if (err) {
 					req.flash("error", "Something went wrong when adding the comment");
 					console.log(err);
@@ -48,11 +48,9 @@ router.post("/", checkLogin, function(req, res){
 					comment.author.id = req.user._id;
 					// add current username to comment
 					comment.author.username = req.user.username;
-					// save comment
 					comment.save();
 					// insert comment on campground
 					campground.comments.push(comment);
-					// save campground
 					campground.save();
 					
 					req.flash("success", "New comment addded successfully");
@@ -67,15 +65,15 @@ router.post("/", checkLogin, function(req, res){
 
 
 // EDIT - show form to edit comment
-router.get("/:comment_id/edit", checkCommentOwnership, function(req, res){
+router.get("/:comment_id/edit", checkCommentOwnership, (req, res) => {
 	// this check is necessary so that the edit page can't be 
 	// corrupted with an invalid campground id
-	Campground.findById(req.params.id, function(err, foundCampground){
+	Campground.findById(req.params.id, (err, foundCampground) => {
 		if (err || !foundCampground){
 			req.flash("error", "Cannot find the campground");
 			return res.redirect("back");
 		} else {
-			Comment.findById(req.params.comment_id, function(err, foundComment){
+			Comment.findById(req.params.comment_id, (err, foundComment) => {
 				if (err) {
 					console.log(err);
 					res.redirect("back");
@@ -91,8 +89,8 @@ router.get("/:comment_id/edit", checkCommentOwnership, function(req, res){
 
 
 // update edited comment
-router.put("/:comment_id", checkCommentOwnership, function(req, res){
-	Comment.findByIdAndUpdate(req.params.comment_id, req.body.comment, function(err, updatedComment){
+router.put("/:comment_id", checkCommentOwnership, (req, res) => {
+	Comment.findByIdAndUpdate(req.params.comment_id, req.body.comment, (err, updatedComment) => {
 		if (err) {
 			console.log(err);
 			res.redirect("back");
@@ -105,8 +103,8 @@ router.put("/:comment_id", checkCommentOwnership, function(req, res){
 
 
 // DESTROY/DELETE comment
-router.delete("/:comment_id", checkCommentOwnership, function(req, res){
-	Comment.findByIdAndRemove(req.params.comment_id, function(err, deletedComment){
+router.delete("/:comment_id", checkCommentOwnership, (req, res) => {
+	Comment.findByIdAndRemove(req.params.comment_id, (err, deletedComment) => {
 		if (err) {
 			console.log(err);
 			req.flash("error", "Something went wrong when deleting the comment");
