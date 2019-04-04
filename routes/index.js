@@ -1,3 +1,4 @@
+import dotenv from "dotenv";
 import express from "express";
 import passport from "passport";
 import async from "async";
@@ -6,6 +7,8 @@ import crypto from "crypto";
 import Campground from "../models/campgrounds";
 import User from "../models/user";
 
+
+dotenv.config();
 const router = express.Router();
 
 // root route
