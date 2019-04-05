@@ -19,6 +19,7 @@ const createCamp = (req, res, campInfo) => {
 	});
 }
 
+
 export {
 	createCamp
 };
