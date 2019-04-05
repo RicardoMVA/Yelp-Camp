@@ -5,6 +5,7 @@ import sharp from "sharp";
 import fs from "fs";
 import NodeGeocoder from "node-geocoder";
 import Campground from "../models/campgrounds";
+import {createCamp} from "../controller/functions";
 import {checkCampgroundOwnership, checkLogin} from "../middleware/index";
 
 dotenv.config();
@@ -134,22 +135,7 @@ router.post("/", checkLogin, upload.single("image"), (req, res) => {
 						lat,
 						lng
 					};
-
-					// create a new campground using 'newCampground' info and saving 
-					// to 'Campground' database
-					Campground.create(newCampground, (err, createdCampground) => {
-						if(err){
-							req.flash("error", "Something went wrong when creating the campground");
-							console.log(err);
-							return res.redirect('back');
-						} else {
-							req.flash("success", "Campground created successfully");
-							console.log(createdCampground);
-
-							// redirect back to campgrounds page
-							res.redirect("/campgrounds");
-						}
-					});
+					createCamp(req, res, newCampground);
 			    }
 			});
 		}
