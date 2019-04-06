@@ -7,17 +7,15 @@ const createCamp = async (req, res) => {
 	const image = await imageOptimize(req, res);
 	const fullLocation = await locateCamp(req, res);
 
-	const author = {
-		id: req.user._id,
-		username: req.user.username
-	};
-
 	const newCampground = {
 		name: req.body.name, 
 		image,
 		price: req.body.price,
 		description: req.body.description,
-		author,
+		author: {
+			id: req.user._id,
+			username: req.user.username
+		},
 		...fullLocation
 	};
 
