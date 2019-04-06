@@ -44,7 +44,11 @@ const imageOptimize = async (req, res) => {
 	const filename = `${req.file.filename}-large.jpg`;
 	// here we optimize the image using 'sharp', by taking the uploaded 
 	// image and passing it through this method
-	sharp(req.file.path).jpeg({quality: 80}).resize(1200).toFile(`images/campgrounds/${filename}`, (err, imageOpt) => {
+	sharp(req.file.path)
+	.jpeg({quality: 80})
+	.resize(1200)
+	.toFile(`images/campgrounds/${filename}`, 
+	(err, imageOpt) => {
 		if (err) {
 			req.flash("error", "Could not optimize image file");
 			console.log(err);
