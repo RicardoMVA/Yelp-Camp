@@ -86,8 +86,6 @@ router.get("/new", checkLogin, (req, res) => {
 // 'upload.single("image")' is taking the 'image' in the form inside 
 // the 'new.ejs' campgrounds page
 router.post("/", checkLogin, upload.single("image"), (req, res) => {
-	// 'req.file.path' comes from 'multer', and is the name of the
-	// file uploaded through the form in 'new.ejs'
 	createCamp(req, res);
 });
 

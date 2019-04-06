@@ -39,6 +39,8 @@ const createCamp = async (req, res) => {
 
 
 const imageOptimize = async (req, res) => {
+	// 'req.file' comes from 'multer', and is the name/path 
+	// of the file uploaded through the form in 'new.ejs'
 	const filename = `${req.file.filename}-large.jpg`;
 	// here we optimize the image using 'sharp', by taking the uploaded 
 	// image and passing it through this method
