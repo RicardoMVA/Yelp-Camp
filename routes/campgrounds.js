@@ -1,12 +1,12 @@
 import dotenv from "dotenv";
 import express from "express";
 import multer from "multer";
-import sharp from "sharp";
 import fs from "fs";
 import Campground from "../models/campgrounds";
-import {createCamp} from "../controller/functions";
+import {createCamp, imageOptimize} from "../controller/functions";
 import {locateCamp} from "../controller/googlemaps";
 import {checkCampgroundOwnership, checkLogin} from "../middleware/index";
+
 
 dotenv.config();
 const router = express.Router();
@@ -88,17 +88,7 @@ router.get("/new", checkLogin, (req, res) => {
 router.post("/", checkLogin, upload.single("image"), (req, res) => {
 	// 'req.file.path' comes from 'multer', and is the name of the
 	// file uploaded through the form in 'new.ejs'
-	// here we optimize the image using 'sharp', by taking the uploaded 
-	// image and passing it through this method
-	sharp(req.file.path).jpeg({quality: 80}).resize(1200).toFile("images/campgrounds/" + req.file.filename + "-large.jpg", (err, imageOpt) => {
-		if (err) {
-			req.flash("error", "Could not optimize image file");
-			console.log(err);
-			return res.redirect("back");
-		} else {
-			locateCamp(req, res, req.body.location);
-		}
-	});
+	createCamp(req, res);
 });
 
 

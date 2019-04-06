@@ -1,10 +1,28 @@
 import Campground from "../models/campgrounds";
+import {locateCamp} from "./googlemaps";
+import sharp from "sharp";
 
 
-const createCamp = (req, res, campInfo) => {
-	// create a new campground using 'campInfo' and saving 
-	// to 'Campground' database
-	Campground.create(campInfo, (err, createdCampground) => {
+const createCamp = async (req, res) => {
+	const image = await imageOptimize(req, res);
+	const fullLocation = await locateCamp(req, res);
+
+	const author = {
+		id: req.user._id,
+		username: req.user.username
+	};
+
+	const newCampground = {
+		name: req.body.name, 
+		image,
+		price: req.body.price,
+		description: req.body.description,
+		author,
+		...fullLocation
+	};
+
+	// create a new campground using 'newCampground'
+	Campground.create(newCampground, (err, createdCampground) => {
 		if(err){
 			req.flash("error", "Something went wrong when creating the campground");
 			console.log(err);
@@ -20,6 +38,22 @@ const createCamp = (req, res, campInfo) => {
 }
 
 
+const imageOptimize = async (req, res) => {
+	const filename = `${req.file.filename}-large.jpg`;
+	// here we optimize the image using 'sharp', by taking the uploaded 
+	// image and passing it through this method
+	sharp(req.file.path).jpeg({quality: 80}).resize(1200).toFile(`images/campgrounds/${filename}`, (err, imageOpt) => {
+		if (err) {
+			req.flash("error", "Could not optimize image file");
+			console.log(err);
+			return res.redirect("back");
+		}
+	});
+	return filename;
+}
+
+
 export {
-	createCamp
+	createCamp,
+	imageOptimize
 };
