@@ -2,19 +2,22 @@ import NodeGeocoder from "node-geocoder";
 import dotenv from "dotenv";
 
 
-const locateCamp = (req, res) => {
+const geocoderConfig = () => {
 	dotenv.config();
 
-	// GOOGLE GEOCODER CONFIG
 	const options = {
 	  provider: 'google',
 	  httpAdapter: 'https',
-	  // this is populated with the API key inside the '.env' file
 	  apiKey: process.env.GEOCODER_API_KEY,
 	  formatter: null
 	};
 
-	const geocoder = NodeGeocoder(options);
+	return NodeGeocoder(options);
+}
+
+
+const locateCamp = (req, res) => {
+	const geocoder = geocoderConfig();
 
 	// a promise is needed since 'geocoder' response is async
 	return new Promise((resolve, reject) => {
