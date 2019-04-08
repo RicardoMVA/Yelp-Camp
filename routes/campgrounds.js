@@ -1,33 +1,12 @@
 import express from "express";
-import multer from "multer";
 import fs from "fs";
 import Campground from "../models/campgrounds";
 import {createCamp} from "../controller/functions";
+import {uploadConfig} from "../controller/image uploading";
 import {checkCampgroundOwnership, checkLogin} from "../middleware/index";
 
 
 const router = express.Router();
-
-// FILE UPLOADING MANAGEMENT
-// using multer to define filename and block non-image files
-const storage = multer.diskStorage({
-	// this determines what the filename will be
-	filename: (req, file, callback) => {
-		callback(null, Date.now() + file.originalname);
-	}
-});
-
-const imageFilter = (req, file, cb) => {
-	// this makes it so that only image files are accepted
-	if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/i)) {
-		return cb(new Error("Only image files (jpg, jpeg, png or gif) are allowed!"), false);
-	} else {
-		cb(null, true);
-	}
-};
-
-// this passes the 'storage' and 'imageFilter' variables
-const upload = multer({storage, fileFilter: imageFilter});
 
 
 // ===================
@@ -80,9 +59,9 @@ router.get("/new", checkLogin, (req, res) => {
 
 
 // CREATE - adds new campground in DB with image, if logged in
-// 'upload.single("image")' is taking the 'image' in the form inside 
-// the 'new.ejs' campgrounds page
-router.post("/", checkLogin, upload.single("image"), (req, res) => {
+// 'uploadConfig().single("image")' is taking the 'image' in 
+// the form inside the 'new.ejs' campgrounds page
+router.post("/", checkLogin, uploadConfig().single("image"), (req, res) => {
 	createCamp(req, res);
 });
 
@@ -106,7 +85,7 @@ router.get("/:id/edit", checkCampgroundOwnership, (req, res) => {
 // UPDATE campground route, if user logged is the same as author
 // 'upload.single("image")' is taking the 'image' in the form inside 
 // the 'edit.ejs' campgrounds page
-router.put("/:id", checkCampgroundOwnership, upload.single("image"), (req, res) => {
+router.put("/:id", checkCampgroundOwnership, uploadConfig().single("image"), (req, res) => {
 	// this runs if no image is sent to update
 	if (!req.file) {
 		// code for checking and storing geocode location
