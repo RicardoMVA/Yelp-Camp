@@ -4,12 +4,15 @@ import sharp from "sharp";
 
 
 const createCamp = async (req, res) => {
-	const image = await imageOptimize(req, res);
+	imageStore(req, res);
+	// 'req.file' comes from 'multer', and is the name/path 
+	// of the file uploaded through the form in 'new.ejs'
+	const imageName = `${req.file.filename}-large.jpg`;
 	const fullLocation = await locateCamp(req, res);
 
 	const newCampground = {
 		name: req.body.name, 
-		image,
+		image: imageName,
 		price: req.body.price,
 		description: req.body.description,
 		author: {
@@ -36,28 +39,24 @@ const createCamp = async (req, res) => {
 }
 
 
-const imageOptimize = async (req, res) => {
-	// 'req.file' comes from 'multer', and is the name/path 
-	// of the file uploaded through the form in 'new.ejs'
-	const filename = `${req.file.filename}-large.jpg`;
+const imageStore = async (req, res) => {
 	// here we optimize the image using 'sharp', by taking the uploaded 
-	// image and passing it through this method
+	// image, compressing and resizing it
 	sharp(req.file.path)
 	.jpeg({quality: 80})
 	.resize(1200)
-	.toFile(`images/campgrounds/${filename}`, 
-	(err, imageOpt) => {
+	.toFile(`images/campgrounds/${req.file.filename}-large.jpg`, 
+	(err) => {
 		if (err) {
-			req.flash("error", "Could not optimize image file");
+			req.flash("error", "Could not store image file");
 			console.log(err);
 			return res.redirect("back");
 		}
 	});
-	return filename;
 }
 
 
 export {
 	createCamp,
-	imageOptimize
+	imageStore
 };
