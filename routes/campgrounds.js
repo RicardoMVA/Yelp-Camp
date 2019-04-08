@@ -3,7 +3,7 @@ import express from "express";
 import multer from "multer";
 import fs from "fs";
 import Campground from "../models/campgrounds";
-import {createCamp, imageOptimize} from "../controller/functions";
+import {createCamp} from "../controller/functions";
 import {locateCamp} from "../controller/googlemaps";
 import {checkCampgroundOwnership, checkLogin} from "../middleware/index";
 
