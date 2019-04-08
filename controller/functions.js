@@ -41,8 +41,8 @@ const createCamp = async (req, res) => {
 
 
 const updateCamp = async (req, res) => {
-	// select campground image name on database
 	let imageName;
+	// search campground image name on database
 	await Campground.findById(req.params.id, (err, campground) => {
 		if (err) {
 			console.log(err);
