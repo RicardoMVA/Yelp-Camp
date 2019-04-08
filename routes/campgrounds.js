@@ -1,14 +1,11 @@
-import dotenv from "dotenv";
 import express from "express";
 import multer from "multer";
 import fs from "fs";
 import Campground from "../models/campgrounds";
 import {createCamp} from "../controller/functions";
-import {locateCamp} from "../controller/googlemaps";
 import {checkCampgroundOwnership, checkLogin} from "../middleware/index";
 
 
-dotenv.config();
 const router = express.Router();
 
 // FILE UPLOADING MANAGEMENT
