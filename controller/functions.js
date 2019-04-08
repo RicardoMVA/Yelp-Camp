@@ -1,4 +1,5 @@
 import Campground from "../models/campgrounds";
+import fs from "fs";
 import {locateCamp} from "./googlemaps";
 import {imageStore} from "./image uploading";
 
@@ -39,6 +40,59 @@ const createCamp = async (req, res) => {
 }
 
 
+const updateCamp = async (req, res) => {
+	// select campground image name on database
+	let imageName;
+	await Campground.findById(req.params.id, (err, campground) => {
+		if (err) {
+			console.log(err);
+			req.flash("error", err.message);
+			res.redirect("/campgrounds");
+		} else {
+			imageName = campground.image;
+		};
+	});
+
+	if (req.file) {
+		imageStore(req, res);
+
+		// delete old image from server folder
+		fs.unlink(`images/campgrounds/${imageName}`, (err) => {
+			if (err) {
+				console.log(err);
+				imageName = `${req.file.filename}-large.jpg`;
+			} else {
+				imageName = `${req.file.filename}-large.jpg`;
+			}
+		});
+	}
+
+	const fullLocation = await locateCamp(req, res);
+
+	const updateCampground = {
+		name: req.body.name, 
+		image: imageName,
+		price: req.body.price,
+		description: req.body.description,
+		...fullLocation
+	};
+
+	// find and update the campground edited
+	Campground.findByIdAndUpdate(req.params.id, updateCampground, (err, updatedCampground) => {
+		if (err) {
+			console.log(err);
+			req.flash("error", err.message);
+			res.redirect("/campgrounds");
+		} else {
+			req.flash("success", "Campground edited successfully");
+			// redirect back to show page
+			res.redirect("/campgrounds/" + req.params.id);
+		}
+	});
+}
+
+
 export {
-	createCamp
+	createCamp,
+	updateCamp
 };

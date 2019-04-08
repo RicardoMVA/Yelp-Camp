@@ -1,7 +1,7 @@
 import express from "express";
 import fs from "fs";
 import Campground from "../models/campgrounds";
-import {createCamp} from "../controller/functions";
+import {createCamp, updateCamp} from "../controller/functions";
 import {uploadConfig} from "../controller/image uploading";
 import {checkCampgroundOwnership, checkLogin} from "../middleware/index";
 
@@ -83,94 +83,10 @@ router.get("/:id/edit", checkCampgroundOwnership, (req, res) => {
 
 
 // UPDATE campground route, if user logged is the same as author
-// 'upload.single("image")' is taking the 'image' in the form inside 
-// the 'edit.ejs' campgrounds page
+// 'uploadConfig.single("image")' is taking the 'image' in the 
+// form inside the 'edit.ejs' campgrounds page
 router.put("/:id", checkCampgroundOwnership, uploadConfig().single("image"), (req, res) => {
-	// this runs if no image is sent to update
-	if (!req.file) {
-		// code for checking and storing geocode location
-		// this is using nodegeocoder
-		geocoder.geocode(req.body.location, (err, data) => {
-		    if (err || !data.length) {
-		      req.flash('error', err);
-		      console.log(err);
-		      return res.redirect('back');
-		    }
-		    req.body.campground.lat = data[0].latitude;
-		    req.body.campground.lng = data[0].longitude;
-		    req.body.campground.location = data[0].formattedAddress;
-
-
-			// find and update the campground edited
-			Campground.findByIdAndUpdate(req.params.id, req.body.campground, (err, updatedCampground) => {
-				if (err) {
-					console.log(err);
-					req.flash("error", err.message);
-					res.redirect("/campgrounds");
-				} else {
-					req.flash("success", "Campground edited successfully");
-					// redirect back to show page
-					res.redirect("/campgrounds/" + req.params.id);
-				}
-			});
-		});
-	// this runs when user sends a new image
-	} else {
-		// 'req.file.path' comes from 'multer', and is the name of the
-		// file uploaded through the form in 'edit.ejs'
-		// here we optimize the image using 'sharp', by taking the uploaded 
-		// image and passing it through this method
-		sharp(req.file.path).jpeg({quality: 80}).resize(2400).toFile("images/campgrounds/" + req.file.filename + "-large.jpg", (err, imageOpt) => {
-			if (err) {
-				req.flash("error", "Could not load and optimize image file");
-				console.log(err);
-				return res.redirect("back");
-			} else {
-				// select campground image on database
-				Campground.findById(req.params.id, (err, campground) => {
-					
-					// delete old image from server folder
-					fs.unlink("images/campgrounds/" + campground.image, (err) => {
-						// if no image is found, simply report the error
-						// and move on
-						console.log(err);
-
-						console.log("images/campgrounds/" + campground.image + " was deleted");
-
-						// define new image name for database
-						req.body.campground.image = req.file.filename + "-large.jpg";
-						
-						// code for checking and storing geocode location
-						// this is using nodegeocoder
-						geocoder.geocode(req.body.location, (err, data) => {
-						    if (err || !data.length) {
-						    	req.flash('error', err);
-						    	console.log(err);
-						    	return res.redirect('back');
-						    }
-						    req.body.campground.lat = data[0].latitude;
-						    req.body.campground.lng = data[0].longitude;
-						    req.body.campground.location = data[0].formattedAddress;
-
-
-							// find and update the campground edited
-							Campground.findByIdAndUpdate(req.params.id, req.body.campground, (err, updatedCampground) => {
-								if (err) {
-									console.log(err);
-									req.flash("error", err.message);
-									res.redirect("/campgrounds");
-								} else {
-									req.flash("success", "Campground edited successfully");
-									// redirect back to show page
-									res.redirect("/campgrounds/" + req.params.id);
-								}
-							});
-						});
-					});
-				});
-			}
-		});
-	}
+	updateCamp(req, res);
 });
 
 
