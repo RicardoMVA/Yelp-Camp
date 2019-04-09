@@ -6,23 +6,26 @@ const createComment = async (req, res) => {
 	// lookup campground using ID
 	Campground.findById(req.params.id, (err, campground) => {
 		if (err) {
-			console.log("Something went wrong when adding a new comment");
+			console.log("Something went wrong when finding the campground");
 			console.log(err);
 			res.redirect("/campgrounds");
 		} else {
+			const newComment = {
+				author: {
+					// 'req.user' takes information from the user 
+					// currently logged in
+					id: req.user._id,
+					username: req.user.username
+				},
+				text: req.body.text
+			}
+			
 			// take what was sent through the form and add to database
-			Comment.create(req.body.comment, (err, comment) => {
+			Comment.create(newComment, (err, comment) => {
 				if (err) {
 					req.flash("error", "Something went wrong when adding the comment");
 					console.log(err);
 				} else {
-					// 'req.user' takes information from the user 
-					// currently logged in
-					// add current user id to comment
-					comment.author.id = req.user._id;
-					// add current username to comment
-					comment.author.username = req.user.username;
-					comment.save();
 					// insert comment on campground
 					campground.comments.push(comment);
 					campground.save();
