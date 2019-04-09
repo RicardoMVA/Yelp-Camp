@@ -1,7 +1,7 @@
 import express from "express";
 import fs from "fs";
 import Campground from "../models/campgrounds";
-import {createCamp, updateCamp, escapeRegex} from "../controller/functions";
+import {createCamp, updateCamp, deleteCamp, escapeRegex} from "../controller/functions";
 import {uploadConfig} from "../controller/image uploading";
 import {checkCampgroundOwnership, checkLogin} from "../middleware/index";
 
@@ -92,28 +92,7 @@ router.put("/:id", checkCampgroundOwnership, uploadConfig().single("image"), (re
 
 // DELETE/DESTROY campground route, if user logged is the same as author
 router.delete("/:id", checkCampgroundOwnership, (req, res) => {
-	// find campground by id to erase it's image
-	Campground.findById(req.params.id, (err, campground) => {			
-		// delete campground image from server folder
-		fs.unlink("images/campgrounds/" + campground.image, (err) => {
-			// if no image is found, simply report the error
-			// and move on
-			console.log(err);
-			console.log("images/campgrounds/" + campground.image + " was deleted");
-
-			// remove campground from database
-			Campground.findByIdAndRemove(req.params.id, (err) => {
-				if (err) {
-					console.log(err);
-					req.flash("error", "Something went wrong when deleting the campground");
-					res.redirect("/campgrounds");
-				} else {
-					req.flash("success", "Campground deleted successfully");
-					res.redirect("/campgrounds");
-				}
-			});
-		});
-	});
+	deleteCamp(req, res);
 });
 
 

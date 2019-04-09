@@ -92,6 +92,31 @@ const updateCamp = async (req, res) => {
 }
 
 
+const deleteCamp = async (req, res) => {
+	// find campground by id to erase it's image
+	await Campground.findById(req.params.id, (err, campground) => {			
+		// delete campground image from server folder
+		fs.unlink(`images/campgrounds/${campground.image}`, (err) => {
+			if(err){
+				console.log(err);
+			}
+		});
+	});
+
+	// remove campground from database
+	Campground.findByIdAndRemove(req.params.id, (err) => {
+		if (err) {
+			console.log(err);
+			req.flash("error", "Something went wrong when deleting the campground");
+			res.redirect("/campgrounds");
+		} else {
+			req.flash("success", "Campground deleted successfully");
+			res.redirect("/campgrounds");
+		}
+	});
+}
+
+
 // use this to avoid possible DDoS attacks
 const escapeRegex = (text) => {
     return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
@@ -101,5 +126,6 @@ const escapeRegex = (text) => {
 export {
 	createCamp,
 	updateCamp,
+	deleteCamp,
 	escapeRegex
 };
