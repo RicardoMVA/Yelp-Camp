@@ -1,8 +1,16 @@
 import express from "express";
 import Campground from "../models/campgrounds";
-import {createCamp, updateCamp, deleteCamp, showAllCamps} from "../controller/functions";
+import {
+	createCamp,
+	updateCamp,
+	deleteCamp,
+	showAllCamps
+} from "../controller/campgrounds functions";
 import {uploadConfig} from "../controller/image uploading";
-import {checkCampgroundOwnership, checkLogin} from "../middleware/index";
+import {
+	checkCampgroundOwnership,
+	checkLogin
+} from "../middleware/index";
 
 
 const router = express.Router();
