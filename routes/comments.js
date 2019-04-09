@@ -4,9 +4,13 @@ import Comment from "../models/comments";
 import {
 	createComment,
 	updateComment,
-	deleteComment
+	deleteComment,
+	showEditForm
 } from "../controller/comments functions";
-import {checkCommentOwnership, checkLogin} from "../middleware/index";
+import {
+	checkCommentOwnership,
+	checkLogin
+} from "../middleware/index";
 
 
 // 'mergeParams' is used to take 'params' from other sources
@@ -40,25 +44,7 @@ router.post("/", checkLogin, (req, res) => {
 
 // EDIT - show form to edit comment
 router.get("/:comment_id/edit", checkCommentOwnership, (req, res) => {
-	// this check is necessary so that the edit page can't be 
-	// corrupted with an invalid campground id
-	Campground.findById(req.params.id, (err, foundCampground) => {
-		if (err || !foundCampground){
-			req.flash("error", "Cannot find the campground");
-			return res.redirect("back");
-		} else {
-			Comment.findById(req.params.comment_id, (err, foundComment) => {
-				if (err) {
-					console.log(err);
-					res.redirect("back");
-				} else {
-					// 'req.params.id' finds the current campground id
-					// 'foundComment' has the 'req.params.comment_id' information
-					res.render("comments/edit", {campground_id: req.params.id, comment:foundComment});
-				}
-			});
-		}
-	});
+	showEditForm(req, res);
 });
 
 

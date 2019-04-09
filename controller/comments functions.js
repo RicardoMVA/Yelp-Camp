@@ -38,6 +38,29 @@ const createComment = async (req, res) => {
 }
 
 
+const showEditForm = async (req, res) => {
+	// this check is necessary so that the edit page can't be 
+	// corrupted with an invalid campground id
+	Campground.findById(req.params.id, (err, foundCampground) => {
+		if (err || !foundCampground){
+			req.flash("error", "Cannot find the campground");
+			return res.redirect("back");
+		} else {
+			Comment.findById(req.params.comment_id, (err, foundComment) => {
+				if (err) {
+					console.log(err);
+					res.redirect("back");
+				} else {
+					// 'req.params.id' finds the current campground id
+					// 'foundComment' has the 'req.params.comment_id' information
+					res.render("comments/edit", {campground_id: req.params.id, comment:foundComment});
+				}
+			});
+		}
+	});
+}
+
+
 const updateComment = async (req, res) => {
 	Comment.findByIdAndUpdate(req.params.comment_id, req.body.comment, (err, updatedComment) => {
 		if (err) {
@@ -68,5 +91,6 @@ const deleteComment = async (req, res) => {
 export {
 	createComment,
 	updateComment,
-	deleteComment
+	deleteComment,
+	showEditForm
 }
