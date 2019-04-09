@@ -38,6 +38,20 @@ const createComment = async (req, res) => {
 }
 
 
+const updateComment = async (req, res) => {
+	Comment.findByIdAndUpdate(req.params.comment_id, req.body.comment, (err, updatedComment) => {
+		if (err) {
+			console.log(err);
+			res.redirect("back");
+		} else {
+			req.flash("success", "Comment edited successfully");
+			res.redirect("/campgrounds/" + req.params.id);
+		}
+	});
+}
+
+
 export {
-	createComment
+	createComment,
+	updateComment
 }

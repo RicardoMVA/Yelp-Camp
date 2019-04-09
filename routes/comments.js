@@ -2,7 +2,8 @@ import express from "express";
 import Campground from "../models/campgrounds";
 import Comment from "../models/comments";
 import {
-	createComment
+	createComment,
+	updateComment
 } from "../controller/comments functions";
 import {checkCommentOwnership, checkLogin} from "../middleware/index";
 
@@ -60,17 +61,8 @@ router.get("/:comment_id/edit", checkCommentOwnership, (req, res) => {
 });
 
 
-// update edited comment
 router.put("/:comment_id", checkCommentOwnership, (req, res) => {
-	Comment.findByIdAndUpdate(req.params.comment_id, req.body.comment, (err, updatedComment) => {
-		if (err) {
-			console.log(err);
-			res.redirect("back");
-		} else {
-			req.flash("success", "Comment edited successfully");
-			res.redirect("/campgrounds/" + req.params.id);
-		}
-	});
+	updateComment(req, res);
 });
 
 
