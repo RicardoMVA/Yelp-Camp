@@ -92,7 +92,14 @@ const updateCamp = async (req, res) => {
 }
 
 
+// use this to avoid possible DDoS attacks
+const escapeRegex = (text) => {
+    return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+};
+
+
 export {
 	createCamp,
-	updateCamp
+	updateCamp,
+	escapeRegex
 };

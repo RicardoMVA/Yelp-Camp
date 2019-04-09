@@ -1,7 +1,7 @@
 import express from "express";
 import fs from "fs";
 import Campground from "../models/campgrounds";
-import {createCamp, updateCamp} from "../controller/functions";
+import {createCamp, updateCamp, escapeRegex} from "../controller/functions";
 import {uploadConfig} from "../controller/image uploading";
 import {checkCampgroundOwnership, checkLogin} from "../middleware/index";
 
@@ -19,7 +19,7 @@ router.get("/", (req, res) => {
 	// this finds the campgrounds according to the 'search' form
 	if (req.query.search) {
 		// this avoids possibility of DDoS attack, converts the search
-		// string into a regular expression
+		// string using a regular expression
 		const regex = new RegExp(escapeRegex(req.query.search), 'gi');
 
 		// get campgrounds from the database that have a name which 
@@ -134,12 +134,6 @@ router.get("/:id", (req, res) => {
 		}
 	});
 });
-
-
-// use this to avoid possible DDoS attacks
-const escapeRegex = (text) => {
-    return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
-};
 
 
 // this is used to pass the routes back to the app.js file
