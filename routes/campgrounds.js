@@ -1,5 +1,4 @@
 import express from "express";
-import fs from "fs";
 import Campground from "../models/campgrounds";
 import {createCamp, updateCamp, deleteCamp, showAllCamps} from "../controller/functions";
 import {uploadConfig} from "../controller/image uploading";
