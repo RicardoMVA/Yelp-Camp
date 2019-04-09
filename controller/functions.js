@@ -117,6 +117,43 @@ const deleteCamp = async (req, res) => {
 }
 
 
+const showAllCamps = async (req, res) => {
+	// this finds the campgrounds according to the 'search' form
+	if (req.query.search) {
+		// this avoids possibility of DDoS attack, converts the search
+		// string using a regular expression
+		const regex = new RegExp(escapeRegex(req.query.search), 'gi');
+
+		// get campgrounds from the database that have a name which 
+		// matches 'search'
+		Campground.find({name: regex}, (err, allCampgrounds) => {
+			if(err){
+				console.log("Error loading the database");
+				console.log(err);
+			} else {
+				// this checks if no campground was found
+				if (allCampgrounds.length < 1){
+					req.flash("error", "No campgrounds match that query, please try again");
+					res.redirect("campgrounds/index");
+				} else {
+					res.render("campgrounds/index", {campgrounds: allCampgrounds, page: "campgrounds"});
+				}
+			}
+		});
+	} else {
+		// get all campgrounds from the database
+		Campground.find({}, (err, allCampgrounds) => {
+			if(err){
+				console.log("Error loading the database");
+				console.log(err);
+			} else {
+				res.render("campgrounds/index", {campgrounds: allCampgrounds, page: "campgrounds"});
+			}
+		});
+	}
+}
+
+
 // use this to avoid possible DDoS attacks
 const escapeRegex = (text) => {
     return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
@@ -127,5 +164,5 @@ export {
 	createCamp,
 	updateCamp,
 	deleteCamp,
-	escapeRegex
+	showAllCamps
 };

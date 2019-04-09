@@ -1,7 +1,7 @@
 import express from "express";
 import fs from "fs";
 import Campground from "../models/campgrounds";
-import {createCamp, updateCamp, deleteCamp, escapeRegex} from "../controller/functions";
+import {createCamp, updateCamp, deleteCamp, showAllCamps} from "../controller/functions";
 import {uploadConfig} from "../controller/image uploading";
 import {checkCampgroundOwnership, checkLogin} from "../middleware/index";
 
@@ -16,39 +16,7 @@ const router = express.Router();
 
 // INDEX - show all campgrounds or searched ones
 router.get("/", (req, res) => {
-	// this finds the campgrounds according to the 'search' form
-	if (req.query.search) {
-		// this avoids possibility of DDoS attack, converts the search
-		// string using a regular expression
-		const regex = new RegExp(escapeRegex(req.query.search), 'gi');
-
-		// get campgrounds from the database that have a name which 
-		// matches 'search'
-		Campground.find({name: regex}, (err, allCampgrounds) => {
-			if(err){
-				console.log("Error loading the database");
-				console.log(err);
-			} else {
-				// this checks if no campground was found
-				if (allCampgrounds.length < 1){
-					req.flash("error", "No campgrounds match that query, please try again");
-					res.redirect("campgrounds/index");
-				} else {
-					res.render("campgrounds/index", {campgrounds: allCampgrounds, page: "campgrounds"});
-				}
-			}
-		});
-	} else {
-		// get all campgrounds from the database
-		Campground.find({}, (err, allCampgrounds) => {
-			if(err){
-				console.log("Error loading the database");
-				console.log(err);
-			} else {
-				res.render("campgrounds/index", {campgrounds: allCampgrounds, page: "campgrounds"});
-			}
-		});
-	}
+	showAllCamps(req, res);
 });
 
 
