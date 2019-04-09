@@ -3,7 +3,8 @@ import Campground from "../models/campgrounds";
 import Comment from "../models/comments";
 import {
 	createComment,
-	updateComment
+	updateComment,
+	deleteComment
 } from "../controller/comments functions";
 import {checkCommentOwnership, checkLogin} from "../middleware/index";
 
@@ -68,16 +69,7 @@ router.put("/:comment_id", checkCommentOwnership, (req, res) => {
 
 // DESTROY/DELETE comment
 router.delete("/:comment_id", checkCommentOwnership, (req, res) => {
-	Comment.findByIdAndRemove(req.params.comment_id, (err, deletedComment) => {
-		if (err) {
-			console.log(err);
-			req.flash("error", "Something went wrong when deleting the comment");
-			res.redirect("back");
-		} else {
-			req.flash("success", "Comment deleted successfully");
-			res.redirect("/campgrounds/" + req.params.id);
-		}
-	});
+	deleteComment(req, res);
 });
 
 

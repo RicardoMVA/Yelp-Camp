@@ -51,7 +51,22 @@ const updateComment = async (req, res) => {
 }
 
 
+const deleteComment = async (req, res) => {
+	Comment.findByIdAndRemove(req.params.comment_id, (err, deletedComment) => {
+		if (err) {
+			console.log(err);
+			req.flash("error", "Something went wrong when deleting the comment");
+			res.redirect("back");
+		} else {
+			req.flash("success", "Comment deleted successfully");
+			res.redirect("/campgrounds/" + req.params.id);
+		}
+	});
+}
+
+
 export {
 	createComment,
-	updateComment
+	updateComment,
+	deleteComment
 }
