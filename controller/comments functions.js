@@ -2,11 +2,11 @@ import Campground from "../models/campgrounds";
 import Comment from "../models/comments";
 
 
-const createComment = async (req, res) => {
+const createComment = (req, res) => {
 	// lookup campground using ID
 	Campground.findById(req.params.id, (err, campground) => {
 		if (err) {
-			console.log("Something went wrong when finding the campground");
+			req.flash("error", "Could not find the campground");
 			console.log(err);
 			res.redirect("/campgrounds");
 		} else {
@@ -19,11 +19,11 @@ const createComment = async (req, res) => {
 				},
 				text: req.body.text
 			}
-			
+
 			// take what was sent through the form and add to database
 			Comment.create(newComment, (err, comment) => {
 				if (err) {
-					req.flash("error", "Something went wrong when adding the comment");
+					req.flash("error", "Could not add the comment");
 					console.log(err);
 				} else {
 					// insert comment on campground
@@ -41,16 +41,18 @@ const createComment = async (req, res) => {
 }
 
 
-const showEditForm = async (req, res) => {
+const showEditForm = (req, res) => {
 	// this check is necessary so that the edit page can't be 
 	// corrupted with an invalid campground id
 	Campground.findById(req.params.id, (err, foundCampground) => {
 		if (err || !foundCampground){
-			req.flash("error", "Cannot find the campground");
+			req.flash("error", "Could not find the campground");
+			console.log(err);
 			return res.redirect("back");
 		} else {
 			Comment.findById(req.params.comment_id, (err, foundComment) => {
 				if (err) {
+					req.flash("error", "Could not find the comment");
 					console.log(err);
 					res.redirect("back");
 				} else {
@@ -64,9 +66,10 @@ const showEditForm = async (req, res) => {
 }
 
 
-const updateComment = async (req, res) => {
+const updateComment = (req, res) => {
 	Comment.findByIdAndUpdate(req.params.comment_id, req.body.comment, (err, updatedComment) => {
 		if (err) {
+			req.flash("error", "Could not update the comment");
 			console.log(err);
 			res.redirect("back");
 		} else {
@@ -77,11 +80,11 @@ const updateComment = async (req, res) => {
 }
 
 
-const deleteComment = async (req, res) => {
+const deleteComment = (req, res) => {
 	Comment.findByIdAndRemove(req.params.comment_id, (err, deletedComment) => {
 		if (err) {
+			req.flash("error", "Could not delete the comment");
 			console.log(err);
-			req.flash("error", "Something went wrong when deleting the comment");
 			res.redirect("back");
 		} else {
 			req.flash("success", "Comment deleted successfully");

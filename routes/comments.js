@@ -27,7 +27,7 @@ router.get("/new", checkLogin, (req, res) => {
 	// find campground by id
 	Campground.findById(req.params.id, (err, campground) => {
 		if (err) {
-			console.log("Something went wrong when finding the ID to write a new comment");
+			console.log("Could not find the campground to write a new comment");
 			console.log(err);
 		} else {
 			res.render("comments/new", {campground});

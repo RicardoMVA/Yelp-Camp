@@ -26,7 +26,7 @@ const createCamp = async (req, res) => {
 	// create a new campground using 'newCampground'
 	Campground.create(newCampground, (err, createdCampground) => {
 		if(err){
-			req.flash("error", "Something went wrong when creating the campground");
+			req.flash("error", "Could not create the campground");
 			console.log(err);
 			return res.redirect('back');
 		} else {
@@ -45,8 +45,8 @@ const updateCamp = async (req, res) => {
 	// search campground image name on database
 	await Campground.findById(req.params.id, (err, campground) => {
 		if (err) {
+			req.flash("error", "Could not find the campground");
 			console.log(err);
-			req.flash("error", err.message);
 			res.redirect("/campgrounds");
 		} else {
 			imageName = campground.image;
@@ -80,8 +80,8 @@ const updateCamp = async (req, res) => {
 	// find and update the campground edited
 	Campground.findByIdAndUpdate(req.params.id, updateCampground, (err, updatedCampground) => {
 		if (err) {
+			req.flash("error", "Could not update the campground");
 			console.log(err);
-			req.flash("error", err.message);
 			res.redirect("/campgrounds");
 		} else {
 			req.flash("success", "Campground edited successfully");
@@ -106,8 +106,8 @@ const deleteCamp = async (req, res) => {
 	// remove campground from database
 	Campground.findByIdAndRemove(req.params.id, (err) => {
 		if (err) {
+			req.flash("error", "Could not delete the campground");
 			console.log(err);
-			req.flash("error", "Something went wrong when deleting the campground");
 			res.redirect("/campgrounds");
 		} else {
 			req.flash("success", "Campground deleted successfully");
@@ -117,7 +117,7 @@ const deleteCamp = async (req, res) => {
 }
 
 
-const showAllCamps = async (req, res) => {
+const showAllCamps = (req, res) => {
 	// this finds the campgrounds according to the 'search' form
 	if (req.query.search) {
 		// this avoids possibility of DDoS attack, converts the search
@@ -128,7 +128,7 @@ const showAllCamps = async (req, res) => {
 		// matches 'search'
 		Campground.find({name: regex}, (err, allCampgrounds) => {
 			if(err){
-				console.log("Error loading the database");
+				req.flash("error", "Could not load the campground database");
 				console.log(err);
 			} else {
 				// this checks if no campground was found
@@ -144,7 +144,7 @@ const showAllCamps = async (req, res) => {
 		// get all campgrounds from the database
 		Campground.find({}, (err, allCampgrounds) => {
 			if(err){
-				console.log("Error loading the database");
+				req.flash("error", "Could not load the campground database");
 				console.log(err);
 			} else {
 				res.render("campgrounds/index", {campgrounds: allCampgrounds, page: "campgrounds"});
