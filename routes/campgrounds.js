@@ -46,7 +46,7 @@ router.get("/:id/edit", checkCampgroundOwnership, (req, res) => {
 	// find the campground to edit, by id
 	Campground.findById(req.params.id, (err, foundCampground) => {
 		if (err) {
-			req.flash("error", "Could not find campground");
+			req.flash("error", "Could not find the campground");
 			console.log(err);
 			res.redirect("back");
 		} else {
@@ -79,7 +79,7 @@ router.get("/:id", (req, res) => {
 		// doesn't returns an error, but also doesn't returns a
 		// valid entry (like 'null')
 		if(err || !foundCampground){
-			req.flash("error", "Could not find campground");
+			req.flash("error", "Could not find the campground");
 			console.log(err);
 			res.redirect("back");
 		} else {
