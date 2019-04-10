@@ -4,7 +4,7 @@ import passport from "passport";
 import async from "async";
 import nodemailer from "nodemailer";
 import crypto from "crypto";
-import {registerUser} from "../src/auth functions";
+import {registerUser, login} from "../src/auth functions";
 import Campground from "../models/campgrounds";
 import User from "../models/user";
 
@@ -42,24 +42,7 @@ router.get("/login", (req, res) => {
 
 // handle login form, checks if user exists and password is correct
 router.post("/login", (req, res, next) => {
-	passport.authenticate("local", (err, user, info) => {
-		if (err || !user) {
-			req.flash("error", "User doesn't exist or password is incorrect");
-			return res.redirect("/login");;
-		} else {
-			req.logIn(user, (err) => {
-				if (err) {
-					console.log(err);
-					req.flash("error", err);
-					res.redirect("/login");
-					return next(err);
-				} else {
-					req.flash("success", "Welcome back, " + user.username);
-					return res.redirect("/campgrounds");
-				}
-			})
-		}
-	}) (req, res, next);
+	login(req, res, next);
 });
 
 

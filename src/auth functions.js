@@ -37,6 +37,29 @@ const registerUser = async (req, res) => {
 }
 
 
+const login = async (req, res, next) => {
+	passport.authenticate("local", (err, user, info) => {
+		if (err || !user) {
+			req.flash("error", "User doesn't exist or password is incorrect");
+			return res.redirect("/login");;
+		} else {
+			req.logIn(user, (err) => {
+				if (err) {
+					console.log(err);
+					req.flash("error", err);
+					res.redirect("/login");
+					return next(err);
+				} else {
+					req.flash("success", "Welcome back, " + user.username);
+					return res.redirect("/campgrounds");
+				}
+			})
+		}
+	}) (req, res, next);
+}
+
+
 export {
-	registerUser
+	registerUser,
+	login
 }
