@@ -6,7 +6,7 @@ import {
 	updateComment,
 	deleteComment,
 	showEditForm
-} from "../controller/comments functions";
+} from "../src/comments functions";
 import {
 	checkCommentOwnership,
 	checkLogin

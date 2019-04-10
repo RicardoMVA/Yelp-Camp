@@ -5,8 +5,8 @@ import {
 	updateCamp,
 	deleteCamp,
 	showAllCamps
-} from "../controller/campgrounds functions";
-import {uploadConfig} from "../controller/image uploading";
+} from "../src/campgrounds functions";
+import {uploadConfig} from "../src/image uploading";
 import {
 	checkCampgroundOwnership,
 	checkLogin
