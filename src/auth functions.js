@@ -75,7 +75,6 @@ const forgotPassword = async (req, res, next) => {
 		if (err) {
 			req.flash("error", "Could not generate validation token");
 			console.log(err);
-			return res.redirect("/forgot");
 		} else {
 			// this 'token' is what makes the 'forgot password'
 			// email be unique
@@ -88,10 +87,8 @@ const forgotPassword = async (req, res, next) => {
 		if (err){
 			req.flash("error", "Could not access database");
 			console.log(err);
-			return res.redirect("/forgot");
 		} else if (!user) {
 			req.flash("error", "No account with that email address exists.");
-			return res.redirect("/forgot");
 		} else {
 			user.resetPasswordToken = token;
 			// this makes the token expire after a while
@@ -128,7 +125,6 @@ const forgotPassword = async (req, res, next) => {
 			if (err) {
 				req.flash("error", "Could not send email");
 				console.log(err);
-				res.redirect("/forgot");
 			} else {
 				req.flash("success", `An email has been sent to ${foundUser.email} with further instructions.`);
 				console.log(`Email sent to ${foundUser.email}`);
@@ -136,7 +132,8 @@ const forgotPassword = async (req, res, next) => {
 			}
 		});
 	} catch (err) {
-		console.log(`This is fine`);
+		console.log(`Could not complete the process to retrieve the password`);
+		res.redirect("/forgot");
 	}
 }
 
