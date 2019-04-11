@@ -85,7 +85,7 @@ const forgotPassword = async (req, res, next) => {
 
 	let foundUser
 	await User.findOne({email: req.body.email}, (err, user) => {
-		if (err) {
+		if (err){
 			req.flash("error", "Could not access database");
 			console.log(err);
 			return res.redirect("/forgot");
@@ -101,39 +101,43 @@ const forgotPassword = async (req, res, next) => {
 		}
 	});
 
-	const mailOptions = {
-		to: foundUser.email,
-		subject: "YelpCamp Password Reset",
-		text: `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n` +
-  			  `Please click on the following link, or paste this into your browser to complete the process:\n\n` +
- 			  `http://${req.headers.host}/reset/${token}\n\n` +
-			  `If you did not request this, please ignore this email and your password will remain unchanged.\n`
+	try {
+		const mailOptions = {
+			to: foundUser.email,
+			subject: "YelpCamp Password Reset",
+			text: `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n` +
+	  			  `Please click on the following link, or paste this into your browser to complete the process:\n\n` +
+	 			  `http://${req.headers.host}/reset/${token}\n\n` +
+				  `If you did not request this, please ignore this email and your password will remain unchanged.\n`
 
-	};
+		};
 
-	// this configures and sends the email to change the password
-	const smtpTransport = nodemailer.createTransport({
-		service: "Gmail",
-		auth: {
-			// go here to allow this to work
-			// https://myaccount.google.com/lesssecureapps
-			user: "ricardovalenca@gmail.com",
-			// this is your email password, inside the '.env' file
-			pass: process.env.GMAILPW
-		}
-	});
+		// this configures and sends the email to change the password
+		const smtpTransport = nodemailer.createTransport({
+			service: "Gmail",
+			auth: {
+				// go here to allow this to work
+				// https://myaccount.google.com/lesssecureapps
+				user: "ricardovalenca@gmail.com",
+				// this is your email password, inside the '.env' file
+				pass: process.env.GMAILPW
+			}
+		});
 
-	smtpTransport.sendMail(mailOptions, (err) => {
-		if (err) {
-			req.flash("error", "Could not send email");
-			console.log(err);
-			res.redirect("/forgot");
-		} else {
-			req.flash("success", `An email has been sent to ${foundUser.email} with further instructions.`);
-			console.log(`Email sent to ${foundUser.email}`);
-			res.redirect("/forgot");
-		}
-	});
+		smtpTransport.sendMail(mailOptions, (err) => {
+			if (err) {
+				req.flash("error", "Could not send email");
+				console.log(err);
+				res.redirect("/forgot");
+			} else {
+				req.flash("success", `An email has been sent to ${foundUser.email} with further instructions.`);
+				console.log(`Email sent to ${foundUser.email}`);
+				res.redirect("/forgot");
+			}
+		});
+	} catch (err) {
+		console.log(`This is fine`);
+	}
 }
 
 
