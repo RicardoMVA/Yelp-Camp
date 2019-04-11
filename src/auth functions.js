@@ -128,8 +128,61 @@ const forgotPassword = async (req, res, next) => {
 }
 
 
+const resetPassword = async (req, res) => {
+	async.waterfall([
+		(done) => {
+			User.findOne({resetPasswordToken: req.params.token, resetPasswordExpires: {$gt: Date.now()}}, (err, user) => {
+				if (!user) {
+					req.flash("error", "Password reset token is invalid or has expired.");
+					return res.redirect("back");
+				}
+				if(req.body.password === req.body.confirm) {
+					// passport.local.mongoose has this 'setPassword' mehtod
+					// that does the password changing by itself (hasing, etc)
+					user.setPassword(req.body.password, (err) => {
+						user.resetPasswordToken = undefined;
+						user.resetPasswordExpires = undefined;
+						user.save((err) => {
+							req.logIn(user, (err) => {
+								done(err, user);
+							});
+						});
+					})
+				} else {
+					req.flash("error", "Passwords do not match.");
+					return res.redirect('back');
+				}
+			});
+		},
+		(user, done) => {
+			const smtpTransport = nodemailer.createTransport({
+				service: "Gmail", 
+				auth: {
+					user: "ricardovalenca@gmail.com",
+					pass: process.env.GMAILPW
+				}
+			});
+			const mailOptions = {
+				to: user.email,
+				from: "ricardovalenca@gmail.com",
+				subject: 'Your password has been changed',
+				text: 'Hello,\n\n' +
+					'This is a confirmation that the password for your account ' + user.email + ' has just been changed.\n'
+			};
+			smtpTransport.sendMail(mailOptions, (err) => {
+				req.flash("success", "Success! Your password has been changed.");
+				done(err);
+			});
+		}
+	], (err) => {
+		res.redirect("/campgrounds");
+	});
+}
+
+
 export {
 	registerUser,
 	login,
-	forgotPassword
+	forgotPassword,
+	resetPassword
 }
