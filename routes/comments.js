@@ -1,6 +1,6 @@
 import express from "express";
-import Campground from "../models/campgrounds";
 import {
+	showCommentForm,
 	createComment,
 	updateComment,
 	deleteComment,
@@ -23,15 +23,7 @@ const router = express.Router({mergeParams: true});
 
 // NEW - shows form to add comment, if logged in
 router.get("/new", checkLogin, (req, res) => {
-	// find campground by id
-	Campground.findById(req.params.id, (err, campground) => {
-		if (err) {
-			console.log("Could not find the campground to write a new comment");
-			console.log(err);
-		} else {
-			res.render("comments/new", {campground});
-		}
-	})
+	showCommentForm(req, res);
 });
 
 

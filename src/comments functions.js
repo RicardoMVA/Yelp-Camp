@@ -2,6 +2,19 @@ import Campground from "../models/campgrounds";
 import Comment from "../models/comments";
 
 
+const showCommentForm = (req, res) => {
+	// find campground by id
+	Campground.findById(req.params.id, (err, campground) => {
+		if (err) {
+			console.log("Could not find the campground to write a new comment");
+			console.log(err);
+		} else {
+			res.render("comments/new", {campground});
+		}
+	})
+}
+
+
 const createComment = (req, res) => {
 	// lookup campground using ID
 	Campground.findById(req.params.id, (err, campground) => {
@@ -95,6 +108,7 @@ const deleteComment = (req, res) => {
 
 
 export {
+	showCommentForm,
 	createComment,
 	updateComment,
 	deleteComment,
