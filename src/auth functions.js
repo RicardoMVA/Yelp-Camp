@@ -1,3 +1,4 @@
+import Campground from "../models/campgrounds";
 import User from "../models/user";
 import passport from "passport";
 import async from "async";
@@ -180,9 +181,31 @@ const resetPassword = async (req, res) => {
 }
 
 
+const showUserProfile = (req, res) => {
+	User.findById(req.params.id, (err, foundUser) => {
+		if (err) {
+			req.flash("error", "Could not find the user");
+			console.log(err);
+			res.redirect("/");
+		} else {
+			// this finds all the campgrounds created by the user profile viewed
+			Campground.find().where("author.id").equals(foundUser._id).exec((err, campgrounds) => {
+				if (err) {
+					req.flash("error", "Could not find the campgrounds created by this user");
+					console.log(err);
+				} else {
+					res.render("users/show", {user: foundUser, campgrounds: campgrounds});
+				}
+			});
+		}
+	});
+}
+
+
 export {
 	registerUser,
 	login,
 	forgotPassword,
-	resetPassword
+	resetPassword,
+	showUserProfile
 }

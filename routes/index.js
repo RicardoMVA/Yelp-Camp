@@ -7,9 +7,9 @@ import {
 	registerUser,
 	login,
 	forgotPassword,
-	resetPassword
+	resetPassword,
+	showUserProfile
 } from "../src/auth functions";
-import Campground from "../models/campgrounds";
 import User from "../models/user";
 
 
@@ -96,23 +96,7 @@ router.post("/reset/:token", (req, res) => {
 
 // users profile route
 router.get("/users/:id", (req, res) => {
-	User.findById(req.params.id, (err, foundUser) => {
-		if (err) {
-			console.log(err);
-			req.flash("error", "Something went wrong finding the user");
-			res.redirect("/");
-		} else {
-			// this finds all the campgrounds created by the user profile viewed
-			Campground.find().where("author.id").equals(foundUser._id).exec((err, campgrounds) => {
-				if (err) {
-					console.log(err);
-					req.flash("error", "Something went wrong finding the campgrounds created by this user");
-				} else {
-					res.render("users/show", {user: foundUser, campgrounds: campgrounds});
-				}
-			});
-		}
-	})
+	showUserProfile(req, res);
 });
 
 
