@@ -3,8 +3,11 @@ import express from "express";
 import passport from "passport";
 import async from "async";
 import nodemailer from "nodemailer";
-import crypto from "crypto";
-import {registerUser, login} from "../src/auth functions";
+import {
+	registerUser,
+	login,
+	forgotPassword
+} from "../src/auth functions";
 import Campground from "../models/campgrounds";
 import User from "../models/user";
 
@@ -66,68 +69,7 @@ router.get("/forgot", (req, res) => {
 
 // forgot password post route
 router.post("/forgot", (req, res, next) => {
-	// waterfall is an array of functions that are called one
-	// after another
-	async.waterfall([
-		(done) => {
-			crypto.randomBytes(20, (err, buf) => {
-				// this 'token' is what makes the 'forgot password'
-				// email be unique
-				const token = buf.toString("hex");
-				done(err, token);
-			});
-		},
-		(token, done) => {
-			User.findOne({email: req.body.email}, (err, user) => {
-				if (!user) {
-					req.flash("error", "No account with that email address exists.");
-					return res.redirect("/forgot");
-				} else {
-					user.resetPasswordToken = token;
-					// this makes the token expire after a while
-					user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
-					user.save((err) => {
-						done(err, token, user);
-					});
-				}
-			});
-		},
-		// this configures and sends the email to change the password
-		(token, user, done) => {
-			const smtpTransport = nodemailer.createTransport({
-				service: "Gmail",
-				auth: {
-					// go here to allow this to work
-					// https://myaccount.google.com/lesssecureapps
-					user: "ricardovalenca@gmail.com",
-					// this is your email password, inside the '.env' file
-					pass: process.env.GMAILPW
-				}
-			});
-			const mailOptions = {
-				to: user.email,
-				from: "ricardovalenca@gmail.com",
-				subject: "YelpCamp Password Reset",
-				text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
-          			  'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
-         			  'http://' + req.headers.host + '/reset/' + token + '\n\n' +
-					  'If you did not request this, please ignore this email and your password will remain unchanged.\n'
-
-			};
-			smtpTransport.sendMail(mailOptions, (err) => {
-				console.log("change password email sent");
-				req.flash("success", "An email has been sent to " + user.email + " with further instructions.");
-				done(err, "done");
-			});
-		}
-
-	], (err) => {
-		if (err) {
-			return next(err);
-		} else {
-			res.redirect("/forgot");
-		}
-	});
+	forgotPassword(req, res, next);
 });
 
 
