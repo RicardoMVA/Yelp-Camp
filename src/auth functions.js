@@ -72,14 +72,24 @@ const forgotPassword = async (req, res, next) => {
 
 	let token
 	await crypto.randomBytes(20, (err, buf) => {
-		// this 'token' is what makes the 'forgot password'
-		// email be unique
-		token = buf.toString("hex");
+		if (err) {
+			req.flash("error", "Could not generate validation token");
+			console.log(err);
+			return res.redirect("/forgot");
+		} else {
+			// this 'token' is what makes the 'forgot password'
+			// email be unique
+			token = buf.toString("hex");
+		}
 	});
 
 	let foundUser
 	await User.findOne({email: req.body.email}, (err, user) => {
-		if (!user) {
+		if (err) {
+			req.flash("error", "Could not access database");
+			console.log(err);
+			return res.redirect("/forgot");
+		} else if (!user) {
 			req.flash("error", "No account with that email address exists.");
 			return res.redirect("/forgot");
 		} else {
@@ -115,10 +125,12 @@ const forgotPassword = async (req, res, next) => {
 
 	smtpTransport.sendMail(mailOptions, (err) => {
 		if (err) {
+			req.flash("error", "Could not send email");
 			console.log(err);
+			res.redirect("/forgot");
 		} else {
 			req.flash("success", `An email has been sent to ${foundUser.email} with further instructions.`);
-			console.log("change password email sent");
+			console.log(`Email sent to ${foundUser.email}`);
 			res.redirect("/forgot");
 		}
 	});
