@@ -4,10 +4,10 @@ import {
 	registerUser,
 	login,
 	forgotPassword,
+	checkTokenAndRender,
 	resetPassword,
 	showUserProfile
 } from "../src/auth functions";
-import User from "../models/user";
 
 
 const router = express.Router();
@@ -72,15 +72,7 @@ router.post("/forgot", (req, res, next) => {
 
 // checks if token is still valid and if it is render 'reset' page
 router.get("/reset/:token", (req, res) => {
-	// '$gt' means 'greater than'
-	User.findOne({resetPasswordToken: req.params.token, resetPasswordExpires: {$gt: Date.now()}}, (err, user) => {
-		if (!user) {
-			req.flash("error", "Password reset token is invalid or has expired.");
-			return res.redirect("/forgot");
-		} else {
-			res.render("reset", {token: req.params.token});
-		}
-	});
+	checkTokenAndRender(req, res);
 });
 
 

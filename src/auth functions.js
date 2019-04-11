@@ -131,6 +131,19 @@ const forgotPassword = async (req, res, next) => {
 }
 
 
+const checkTokenAndRender = (req, res) => {
+	// '$gt' means 'greater than'
+	User.findOne({resetPasswordToken: req.params.token, resetPasswordExpires: {$gt: Date.now()}}, (err, user) => {
+		if (!user) {
+			req.flash("error", "Password reset token is invalid or has expired.");
+			return res.redirect("/forgot");
+		} else {
+			res.render("reset", {token: req.params.token});
+		}
+	});
+}
+
+
 const resetPassword = async (req, res) => {
 	dotenv.config();
 	async.waterfall([
@@ -209,6 +222,7 @@ export {
 	registerUser,
 	login,
 	forgotPassword,
+	checkTokenAndRender,
 	resetPassword,
 	showUserProfile
 }
