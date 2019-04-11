@@ -1,3 +1,4 @@
+import dotenv from "dotenv";
 import Campground from "../models/campgrounds";
 import User from "../models/user";
 import passport from "passport";
@@ -64,6 +65,7 @@ const login = async (req, res, next) => {
 
 
 const forgotPassword = async (req, res, next) => {
+	dotenv.config();
 	// waterfall is an array of functions that are called one
 	// after another
 	async.waterfall([
@@ -130,6 +132,7 @@ const forgotPassword = async (req, res, next) => {
 
 
 const resetPassword = async (req, res) => {
+	dotenv.config();
 	async.waterfall([
 		(done) => {
 			User.findOne({resetPasswordToken: req.params.token, resetPasswordExpires: {$gt: Date.now()}}, (err, user) => {
