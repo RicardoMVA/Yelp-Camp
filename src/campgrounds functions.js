@@ -4,6 +4,43 @@ import {locateCamp} from "./googlemaps";
 import {imageStore} from "./image uploading";
 
 
+const showAllCamps = (req, res) => {
+	// this finds the campgrounds according to the 'search' form
+	if (req.query.search) {
+		// this avoids possibility of DDoS attack, converts the search
+		// string using a regular expression
+		const regex = new RegExp(escapeRegex(req.query.search), 'gi');
+
+		// get campgrounds from the database that have a name which 
+		// matches 'search'
+		Campground.find({name: regex}, (err, allCampgrounds) => {
+			if(err){
+				req.flash("error", "Could not load the campground database");
+				console.log(err);
+			} else {
+				// this checks if no campground was found
+				if (allCampgrounds.length < 1){
+					req.flash("error", "No campgrounds match that query, please try again");
+					res.redirect("campgrounds/index");
+				} else {
+					res.render("campgrounds/index", {campgrounds: allCampgrounds, page: "campgrounds"});
+				}
+			}
+		});
+	} else {
+		// get all campgrounds from the database
+		Campground.find({}, (err, allCampgrounds) => {
+			if(err){
+				req.flash("error", "Could not load the campground database");
+				console.log(err);
+			} else {
+				res.render("campgrounds/index", {campgrounds: allCampgrounds, page: "campgrounds"});
+			}
+		});
+	}
+}
+
+
 const createCamp = async (req, res) => {
 	imageStore(req, res);
 	// 'req.file' comes from 'multer', and is the name/path 
@@ -37,6 +74,21 @@ const createCamp = async (req, res) => {
 			res.redirect("/campgrounds");
 		}
 	});
+}
+
+
+const showEditCamp = (req, res) => {
+	// find the campground to edit, by id
+	Campground.findById(req.params.id, (err, foundCampground) => {
+		if (err) {
+			req.flash("error", "Could not find the campground");
+			console.log(err);
+			res.redirect("back");
+		} else {
+			// show edit form
+			res.render("campgrounds/edit", {campground: foundCampground});
+		}
+	});	
 }
 
 
@@ -117,40 +169,21 @@ const deleteCamp = async (req, res) => {
 }
 
 
-const showAllCamps = (req, res) => {
-	// this finds the campgrounds according to the 'search' form
-	if (req.query.search) {
-		// this avoids possibility of DDoS attack, converts the search
-		// string using a regular expression
-		const regex = new RegExp(escapeRegex(req.query.search), 'gi');
-
-		// get campgrounds from the database that have a name which 
-		// matches 'search'
-		Campground.find({name: regex}, (err, allCampgrounds) => {
-			if(err){
-				req.flash("error", "Could not load the campground database");
-				console.log(err);
-			} else {
-				// this checks if no campground was found
-				if (allCampgrounds.length < 1){
-					req.flash("error", "No campgrounds match that query, please try again");
-					res.redirect("campgrounds/index");
-				} else {
-					res.render("campgrounds/index", {campgrounds: allCampgrounds, page: "campgrounds"});
-				}
-			}
-		});
-	} else {
-		// get all campgrounds from the database
-		Campground.find({}, (err, allCampgrounds) => {
-			if(err){
-				req.flash("error", "Could not load the campground database");
-				console.log(err);
-			} else {
-				res.render("campgrounds/index", {campgrounds: allCampgrounds, page: "campgrounds"});
-			}
-		});
-	}
+const showCampDetails = (req, res) => {
+	// find the campground with provided ID
+	Campground.findById(req.params.id).populate("comments").exec((err, foundCampground) => {
+		// this 'or' statement handles scenarios where the database
+		// doesn't returns an error, but also doesn't returns a
+		// valid entry (like 'null')
+		if(err || !foundCampground){
+			req.flash("error", "Could not find the campground");
+			console.log(err);
+			res.redirect("back");
+		} else {
+			// render show template with that campground
+			res.render("campgrounds/show", {campground: foundCampground});
+		}
+	});
 }
 
 
@@ -161,8 +194,10 @@ const escapeRegex = (text) => {
 
 
 export {
+	showAllCamps,
 	createCamp,
+	showEditCamp,
 	updateCamp,
 	deleteCamp,
-	showAllCamps
+	showCampDetails
 };

@@ -1,10 +1,11 @@
 import express from "express";
-import Campground from "../models/campgrounds";
 import {
+	showAllCamps,
 	createCamp,
+	showEditCamp,
 	updateCamp,
 	deleteCamp,
-	showAllCamps
+	showCampDetails
 } from "../src/campgrounds functions";
 import {uploadConfig} from "../src/image uploading";
 import {
@@ -43,17 +44,7 @@ router.post("/", checkLogin, uploadConfig().single("image"), (req, res) => {
 
 // EDIT campground route, if user logged is the same as author
 router.get("/:id/edit", checkCampgroundOwnership, (req, res) => {
-	// find the campground to edit, by id
-	Campground.findById(req.params.id, (err, foundCampground) => {
-		if (err) {
-			req.flash("error", "Could not find the campground");
-			console.log(err);
-			res.redirect("back");
-		} else {
-			// show edit form
-			res.render("campgrounds/edit", {campground: foundCampground});
-		}
-	});	
+	showEditCamp(req, res);
 });
 
 
@@ -73,20 +64,7 @@ router.delete("/:id", checkCampgroundOwnership, (req, res) => {
 
 // SHOW - show detailed info on selected campground
 router.get("/:id", (req, res) => {
-	// find the campground with provided ID
-	Campground.findById(req.params.id).populate("comments").exec((err, foundCampground) => {
-		// this 'or' statement handles scenarios where the database
-		// doesn't returns an error, but also doesn't returns a
-		// valid entry (like 'null')
-		if(err || !foundCampground){
-			req.flash("error", "Could not find the campground");
-			console.log(err);
-			res.redirect("back");
-		} else {
-			// render show template with that campground
-			res.render("campgrounds/show", {campground: foundCampground});
-		}
-	});
+	showCampDetails(req, res);
 });
 
 

@@ -1,6 +1,5 @@
 import express from "express";
 import Campground from "../models/campgrounds";
-import Comment from "../models/comments";
 import {
 	createComment,
 	updateComment,
