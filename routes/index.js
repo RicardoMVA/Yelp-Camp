@@ -1,8 +1,8 @@
 import express from "express";
-import passport from "passport";
 import {
 	registerUser,
 	login,
+	logout,
 	forgotPassword,
 	checkTokenAndRender,
 	resetPassword,
@@ -48,9 +48,7 @@ router.post("/login", (req, res, next) => {
 
 // logout route
 router.get("/logout", (req, res) => {
-	req.logout();
-	req.flash("success", "Logged you out!");
-	res.redirect("/campgrounds");
+	logout(req, res);
 });
 
 

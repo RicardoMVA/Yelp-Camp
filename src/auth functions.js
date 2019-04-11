@@ -7,7 +7,7 @@ import nodemailer from "nodemailer";
 import crypto from "crypto";
 
 
-const registerUser = async (req, res) => {
+const registerUser = (req, res) => {
 	// take username from form
 	let newUser = new User({
 		username: req.body.username, 
@@ -16,9 +16,8 @@ const registerUser = async (req, res) => {
 	});
 
 	// checks if user inputted the correct adminCode, and if it did
-	// turns him/her into an admin. note that this code doesn't runs
-	// if the condition is false
-	if (req.body.adminCode === 'secretcode') {
+	// turns him/her into an admin
+	if (req.body.adminCode === "secretcode") {
 		newUser.isAdmin = true;
 	}
 
@@ -26,15 +25,12 @@ const registerUser = async (req, res) => {
 	// DB (username, picture, email, password hash)
 	User.register(newUser, req.body.password, (err, user) => {
 		if (err) {
+			req.flash("error", "Could not register user");
 			console.log(err);
-			// this tells the user what was the error. it comes from
-			// 'passport-local-mongoose', since we're using the 
-			// built-in 'err.message'
-			req.flash("error", err.message);
 			return res.redirect("/register");
 		} else {
 			passport.authenticate("local")(req, res, () => {
-				req.flash("success", "Welcome to YelpCamp " + user.username);
+				req.flash("success", `Welcome to YelpCamp ${user.username}`);
 				res.redirect("/campgrounds");
 			});
 		}
@@ -61,6 +57,13 @@ const login = async (req, res, next) => {
 			})
 		}
 	}) (req, res, next);
+}
+
+
+const logout = (req, res) => {
+	req.logout();
+	req.flash("success", "Logged you out!");
+	res.redirect("/campgrounds");
 }
 
 
@@ -221,6 +224,7 @@ const showUserProfile = (req, res) => {
 export {
 	registerUser,
 	login,
+	logout,
 	forgotPassword,
 	checkTokenAndRender,
 	resetPassword,
