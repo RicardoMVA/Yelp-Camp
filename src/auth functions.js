@@ -163,7 +163,6 @@ const resetPassword = async (req, res) => {
 		
 		if (!user) {
 			req.flash("error", "Password reset token is invalid or has expired.");
-			return res.redirect("back");
 		}
 
 		if(req.body.password === req.body.confirm) {
@@ -181,7 +180,6 @@ const resetPassword = async (req, res) => {
 			})
 		} else {
 			req.flash("error", "Passwords do not match.");
-			return res.redirect("back");
 		}
 	});
 
@@ -212,7 +210,6 @@ const resetPassword = async (req, res) => {
 		});
 	} catch (err) {
 		console.log(`Could not complete the process to reset the password`);
-		console.log(err);
 		res.redirect("back");
 	}
 }
