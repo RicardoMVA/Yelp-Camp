@@ -27,4 +27,4 @@
 <h2>Running the project:</h2>
 <p>Install Node.JS, NPM package manager, and the project zip file. In the project root folder, run 'npm install', then 'npm start'.</p>
 <p>Alternatively, the entry point is the 'app-bundle.js' file - you can run it with 'node' command as-is.</p>
-<p>Note that for local Database usage, you need MongoDB installed</p>
+<p>Note that for local Database usage, you need MongoDB installed.</p>
