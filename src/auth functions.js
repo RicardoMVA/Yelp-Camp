@@ -2,7 +2,6 @@ import dotenv from "dotenv";
 import Campground from "../models/campgrounds";
 import User from "../models/user";
 import passport from "passport";
-import async from "async";
 import nodemailer from "nodemailer";
 import crypto from "crypto";
 
@@ -67,7 +66,7 @@ const logout = (req, res) => {
 }
 
 
-const forgotPassword = async (req, res, next) => {
+const forgotPassword = async (req, res) => {
 	dotenv.config();
 
 	let token
@@ -127,7 +126,7 @@ const forgotPassword = async (req, res, next) => {
 				console.log(err);
 			} else {
 				req.flash("success", `An email has been sent to ${foundUser.email} with further instructions.`);
-				console.log(`Email sent to ${foundUser.email}`);
+				console.log(`Email sent to user ID: ${foundUser._id}`);
 				res.redirect("/forgot");
 			}
 		});
@@ -140,7 +139,7 @@ const forgotPassword = async (req, res, next) => {
 
 const checkTokenAndRender = (req, res) => {
 	// '$gt' means 'greater than'
-	User.findOne({resetPasswordToken: req.params.token, resetPasswordExpires: {$gt: Date.now()}}, (err, user) => {
+	User.findOne({resetPasswordToken: req.params.token,	resetPasswordExpires: {$gt: Date.now()}}, (err, user) => {
 		if (!user) {
 			req.flash("error", "Password reset token is invalid or has expired.");
 			return res.redirect("/forgot");
@@ -153,54 +152,63 @@ const checkTokenAndRender = (req, res) => {
 
 const resetPassword = async (req, res) => {
 	dotenv.config();
-	async.waterfall([
-		(done) => {
-			User.findOne({resetPasswordToken: req.params.token, resetPasswordExpires: {$gt: Date.now()}}, (err, user) => {
-				if (!user) {
-					req.flash("error", "Password reset token is invalid or has expired.");
-					return res.redirect("back");
-				}
-				if(req.body.password === req.body.confirm) {
-					// passport.local.mongoose has this 'setPassword' mehtod
-					// that does the password changing by itself (hasing, etc)
-					user.setPassword(req.body.password, (err) => {
-						user.resetPasswordToken = undefined;
-						user.resetPasswordExpires = undefined;
-						user.save((err) => {
-							req.logIn(user, (err) => {
-								done(err, user);
-							});
-						});
-					})
-				} else {
-					req.flash("error", "Passwords do not match.");
-					return res.redirect('back');
-				}
-			});
-		},
-		(user, done) => {
-			const smtpTransport = nodemailer.createTransport({
-				service: "Gmail", 
-				auth: {
-					user: "ricardovalenca@gmail.com",
-					pass: process.env.GMAILPW
-				}
-			});
-			const mailOptions = {
-				to: user.email,
-				from: "ricardovalenca@gmail.com",
-				subject: 'Your password has been changed',
-				text: 'Hello,\n\n' +
-					'This is a confirmation that the password for your account ' + user.email + ' has just been changed.\n'
-			};
-			smtpTransport.sendMail(mailOptions, (err) => {
-				req.flash("success", "Success! Your password has been changed.");
-				done(err);
-			});
+
+	let foundUser
+	await User.findOne({resetPasswordToken: req.params.token, resetPasswordExpires: {$gt: Date.now()}}, (err, user) => {
+		if (!user) {
+			req.flash("error", "Password reset token is invalid or has expired.");
+			return res.redirect("back");
 		}
-	], (err) => {
-		res.redirect("/campgrounds");
+
+		if(req.body.password === req.body.confirm) {
+			foundUser = user;
+			// passport.local.mongoose has this 'setPassword' mehtod
+			// that does the password changing by itself (hasing, etc)
+			user.setPassword(req.body.password, (err) => {
+				user.resetPasswordToken = undefined;
+				user.resetPasswordExpires = undefined;
+				user.save((err) => {
+					req.logIn(user, (err) => {
+						console.log(`Password changed for user ID: ${user._id}`)
+					});
+				});
+			})
+		} else {
+			req.flash("error", "Passwords do not match.");
+			return res.redirect('back');
+		}
 	});
+
+	try {
+		const mailOptions = {
+			to: foundUser.email,
+			from: "ricardovalenca@gmail.com",
+			subject: 'Your password has been changed',
+			text: 'Hello,\n\n' +
+				`This is a confirmation that the password for your account ${foundUser.email} has just been changed.\n`
+		};
+
+		const smtpTransport = nodemailer.createTransport({
+			service: "Gmail", 
+			auth: {
+				user: "ricardovalenca@gmail.com",
+				pass: process.env.GMAILPW
+			}
+		});
+
+		smtpTransport.sendMail(mailOptions, (err) => {
+			if (err) {
+				console.log(err);
+			} else {
+				req.flash("success", "Success! Your password has been changed.");
+				res.redirect("/campgrounds");
+			}
+		});
+	} catch (err) {
+		console.log(`Could not complete the process to reset the password`);
+		console.log(err);
+		res.redirect("/campgrounds");
+	}
 }
 
 
