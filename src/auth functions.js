@@ -139,7 +139,10 @@ const forgotPassword = async (req, res) => {
 
 const checkTokenAndRender = (req, res) => {
 	// '$gt' means 'greater than'
-	User.findOne({resetPasswordToken: req.params.token,	resetPasswordExpires: {$gt: Date.now()}}, (err, user) => {
+	User.findOne(
+		{resetPasswordToken: req.params.token, resetPasswordExpires: {$gt: Date.now()}}, 
+		(err, user) => {
+
 		if (!user) {
 			req.flash("error", "Password reset token is invalid or has expired.");
 			return res.redirect("/forgot");
@@ -154,7 +157,10 @@ const resetPassword = async (req, res) => {
 	dotenv.config();
 
 	let foundUser
-	await User.findOne({resetPasswordToken: req.params.token, resetPasswordExpires: {$gt: Date.now()}}, (err, user) => {
+	await User.findOne(
+		{resetPasswordToken: req.params.token, resetPasswordExpires: {$gt: Date.now()}},
+		(err, user) => {
+		
 		if (!user) {
 			req.flash("error", "Password reset token is invalid or has expired.");
 			return res.redirect("back");
@@ -175,7 +181,7 @@ const resetPassword = async (req, res) => {
 			})
 		} else {
 			req.flash("error", "Passwords do not match.");
-			return res.redirect('back');
+			return res.redirect("back");
 		}
 	});
 
@@ -183,8 +189,8 @@ const resetPassword = async (req, res) => {
 		const mailOptions = {
 			to: foundUser.email,
 			from: "ricardovalenca@gmail.com",
-			subject: 'Your password has been changed',
-			text: 'Hello,\n\n' +
+			subject: "Your password has been changed",
+			text: "Hello,\n\n" +
 				`This is a confirmation that the password for your account ${foundUser.email} has just been changed.\n`
 		};
 
@@ -207,7 +213,7 @@ const resetPassword = async (req, res) => {
 	} catch (err) {
 		console.log(`Could not complete the process to reset the password`);
 		console.log(err);
-		res.redirect("/campgrounds");
+		res.redirect("back");
 	}
 }
 
