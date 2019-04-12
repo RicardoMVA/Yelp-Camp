@@ -220,12 +220,11 @@ const showUserProfile = (req, res) => {
 		if (err) {
 			req.flash("error", "Could not find the user");
 			console.log(err);
-			res.redirect("/");
+			res.redirect("/campgrounds");
 		} else {
 			// this finds all the campgrounds created by the user profile viewed
 			Campground.find().where("author.id").equals(foundUser._id).exec((err, campgrounds) => {
 				if (err) {
-					req.flash("error", "Could not find the campgrounds created by this user");
 					console.log(err);
 				} else {
 					res.render("users/show", {user: foundUser, campgrounds: campgrounds});
