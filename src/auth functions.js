@@ -108,12 +108,13 @@ const forgotPassword = async (req, res) => {
 
 		// this configures and sends the email to change the password
 		const smtpTransport = nodemailer.createTransport({
+			// go here to allow this to work
+			// https://myaccount.google.com/lesssecureapps
+			// also may be necessary to access this link
+			// https://accounts.google.com/b/0/DisplayUnlockCaptcha
 			service: "Gmail",
 			auth: {
-				// go here to allow this to work
-				// https://myaccount.google.com/lesssecureapps
 				user: "ricardovalenca@gmail.com",
-				// this is your email password, inside the '.env' file
 				pass: process.env.GMAILPW
 			}
 		});
