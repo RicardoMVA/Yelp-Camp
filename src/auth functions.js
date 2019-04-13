@@ -1,4 +1,3 @@
-import dotenv from "dotenv";
 import Campground from "../models/campgrounds";
 import User from "../models/user";
 import passport from "passport";
@@ -67,8 +66,6 @@ const logout = (req, res) => {
 
 
 const forgotPassword = async (req, res) => {
-	dotenv.config();
-
 	let token
 	await crypto.randomBytes(20, (err, buf) => {
 		if (err) {
@@ -155,8 +152,6 @@ const checkTokenAndRender = (req, res) => {
 
 
 const resetPassword = async (req, res) => {
-	dotenv.config();
-
 	let foundUser
 	await User.findOne(
 		{resetPasswordToken: req.params.token, resetPasswordExpires: {$gt: Date.now()}},

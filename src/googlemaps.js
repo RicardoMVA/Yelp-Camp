@@ -1,10 +1,7 @@
 import NodeGeocoder from "node-geocoder";
-import dotenv from "dotenv";
 
 
 const geocoderConfig = () => {
-	dotenv.config();
-
 	const options = {
 	  provider: 'google',
 	  httpAdapter: 'https',

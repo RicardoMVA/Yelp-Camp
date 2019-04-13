@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack",
-    "start": "node app-bundle.js"
+    "start": "node --require dotenv app-bundle.js"
   },
   "author": "Ricardo de Melo Valença Alves",
   "license": "ISC",
