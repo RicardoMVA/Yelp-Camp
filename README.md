@@ -24,6 +24,14 @@
 <li>Migration to Bootstrap 4</li>
 </ul>
 
+<p>Todo's:</p>
+<ul>
+<li>Make sure corresponding comments get deleted when deleting a campground;</li>
+<li>Allow user to upload profile image;</li>
+<li>Make small/thumbnail copy of campground image, so that main campgrounds page becomes faster;</li>
+<li>Lazy loading and/or pagination in main campgrounds page</li>
+</ul>
+
 <h2>Running the project:</h2>
 <p>Install Node.JS, NPM package manager, and the project zip file. In the project root folder, run 'npm install', then 'npm start'.</p>
 <p>Alternatively, the entry point is the 'app-bundle.js' file - you can run it with 'node' command as-is.</p>
